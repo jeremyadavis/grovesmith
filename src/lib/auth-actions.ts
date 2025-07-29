@@ -46,3 +46,38 @@ export async function signOut() {
   revalidatePath('/', 'layout');
   redirect('/login');
 }
+
+export async function addRecipient(formData: FormData) {
+  const supabase = await createClient();
+  
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  const name = formData.get('name') as string;
+  const allowanceAmount = parseFloat(formData.get('allowanceAmount') as string);
+
+  if (!name?.trim()) {
+    throw new Error('Name is required');
+  }
+
+  if (isNaN(allowanceAmount) || allowanceAmount < 0) {
+    throw new Error('Valid allowance amount is required');
+  }
+
+  const { error } = await supabase
+    .from('recipients')
+    .insert({
+      name: name.trim(),
+      allowance_amount: allowanceAmount,
+      manager_id: user.id,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath('/dashboard');
+}

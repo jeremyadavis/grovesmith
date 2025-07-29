@@ -7,18 +7,26 @@ import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
   const user = await getUser();
-  
+
   if (!user) {
-    redirect('/login-server');
+    redirect('/login');
   }
-  
+
   // Create manager profile if it doesn't exist
   await createManagerProfile(user);
 
   const supabase = await createClient();
   const { data: recipients, error } = await supabase
     .from('recipients')
-    .select('*')
+    .select(
+      `
+      *,
+      allowance_categories (
+        category_type,
+        balance
+      )
+    `
+    )
     .eq('manager_id', user.id)
     .eq('is_active', true)
     .eq('is_archived', false)
@@ -28,13 +36,38 @@ export default async function DashboardPage() {
     console.error('Error fetching recipients:', error);
   }
 
+  // Transform the data to include categories in a more usable format
+  const recipientsWithCategories =
+    recipients?.map((recipient) => {
+      const categories = {
+        give: 0,
+        spend: 0,
+        save: 0,
+        invest: 0,
+      };
+
+      if (recipient.allowance_categories) {
+        recipient.allowance_categories.forEach(
+          (cat: { category_type: string; balance: number }) => {
+            categories[cat.category_type as keyof typeof categories] =
+              cat.balance;
+          }
+        );
+      }
+
+      return {
+        ...recipient,
+        categories,
+      };
+    }) || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <DashboardHeader />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">
             Welcome back!
           </h1>
           <p className="text-gray-600">
@@ -42,16 +75,16 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipients?.map((recipient) => (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {recipientsWithCategories.map((recipient) => (
             <RecipientCard key={recipient.id} recipient={recipient} />
           ))}
           <AddRecipientCard />
         </div>
 
-        {recipients?.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 mb-4">
+        {recipientsWithCategories.length === 0 && (
+          <div className="py-12 text-center">
+            <div className="mb-4 text-gray-500">
               <svg
                 className="mx-auto h-12 w-12"
                 fill="none"
@@ -66,11 +99,12 @@ export default async function DashboardPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="mb-2 text-lg font-medium text-gray-900">
               No recipients yet
             </h3>
-            <p className="text-gray-500 mb-4">
-              Get started by adding your first child to begin their financial learning journey.
+            <p className="mb-4 text-gray-500">
+              Get started by adding your first child to begin their financial
+              learning journey.
             </p>
           </div>
         )}
