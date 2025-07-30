@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Recipient {
@@ -21,7 +22,8 @@ export function RecipientCard({ recipient }: RecipientCardProps) {
   const categories = recipient.categories || { give: 0, spend: 0, save: 0, invest: 0 };
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+    <Link href={`/recipients/${recipient.id}`}>
+      <Card className="hover:shadow-md transition-shadow cursor-pointer">
       <CardHeader className="pb-3">
         <div className="flex items-center space-x-3">
           <div className="h-12 w-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
@@ -55,6 +57,7 @@ export function RecipientCard({ recipient }: RecipientCardProps) {
           </div>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </Link>
   );
 }

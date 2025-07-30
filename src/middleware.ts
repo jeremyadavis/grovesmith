@@ -30,22 +30,33 @@ export async function middleware(request: NextRequest) {
     error
   } = await supabase.auth.getUser();
 
-  console.log('Middleware:', {
-    path: request.nextUrl.pathname,
-    hasUser: !!user,
-    error: error?.message,
-    authCookies: request.cookies.getAll().filter(c => c.name.includes('supabase')).map(c => c.name)
-  });
+  // Skip processing for development files and static assets
+  if (
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.startsWith('/favicon.ico') ||
+    request.nextUrl.pathname.startsWith('/.well-known') ||
+    request.nextUrl.pathname.includes('_buildManifest') ||
+    request.nextUrl.pathname.includes('app-build-manifest')
+  ) {
+    return response;
+  }
+
+  // Only log for actual page requests in development
+  if (process.env.NODE_ENV === 'development' && !request.nextUrl.pathname.startsWith('/_next')) {
+    console.log('Middleware:', {
+      path: request.nextUrl.pathname,
+      hasUser: !!user,
+      error: error?.message,
+    });
+  }
 
   // Auth redirects
   if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth/callback') && !request.nextUrl.pathname.startsWith('/debug')) {
-    console.log('Middleware: Redirecting to login - no user');
     const redirectUrl = new URL('/login', request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
   if (user && (request.nextUrl.pathname.startsWith('/login'))) {
-    console.log('Middleware: Redirecting to dashboard - user logged in');
     const redirectUrl = new URL('/dashboard', request.url);
     return NextResponse.redirect(redirectUrl);
   }
