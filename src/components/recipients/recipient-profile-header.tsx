@@ -2,7 +2,9 @@
 
 import { ArrowLeft, ArrowRight, Gift, ChefHat, Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { getRecipientTheme } from '@/lib/profile-themes';
+import { DistributeFundsModal } from './distribute-funds-modal';
 
 interface Recipient {
   id: string;
@@ -30,6 +32,7 @@ interface RecipientProfileHeaderProps {
 
 export function RecipientProfileHeader({ recipient, allRecipients, onCategorySelect, activeCategory = "give" }: RecipientProfileHeaderProps) {
   const router = useRouter();
+  const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
   
   // Get the theme for this recipient
   const theme = getRecipientTheme(recipient.id);
@@ -60,6 +63,12 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
     const nextIndex = currentIndex === allRecipients.length - 1 ? 0 : currentIndex + 1;
     const nextRecipient = allRecipients[nextIndex];
     router.push(`/recipients/${nextRecipient.id}`);
+  };
+
+  const handleDistribute = (distribution: { give: number; spend: number; save: number; invest: number }, date: Date) => {
+    // TODO: Implement actual distribution logic with server action
+    console.log('Distributing:', distribution, 'on date:', date);
+    // For now, just log the distribution - we'll implement the server action later
   };
 
   return (
@@ -95,10 +104,21 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
             {recipient.name}
           </h1>
 
-          {/* Allowance */}
-          <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
-            $ {recipient.allowance_amount.toFixed(2)} allowance
-          </p>
+          {/* Undistributed Funds */}
+          <div className="flex flex-col items-center space-y-2">
+            <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
+              $ {(recipient.allowance_amount * 3).toFixed(2)} to distribute
+            </p>
+            <p className={`text-sm ${theme.textColor === 'text-gray-800' ? 'text-gray-500' : 'text-gray-600'}`}>
+              3 weeks pending
+            </p>
+            <button 
+              onClick={() => setIsDistributeModalOpen(true)}
+              className="bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-lg text-sm font-medium text-gray-800 hover:bg-white/30 transition-colors"
+            >
+              Distribute Funds
+            </button>
+          </div>
 
           {/* Trophy carousel */}
           <div className="flex space-x-4 mt-6">
@@ -199,6 +219,14 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
           </button>
         </div>
       </div>
+
+      {/* Distribution Modal */}
+      <DistributeFundsModal
+        recipient={recipient}
+        isOpen={isDistributeModalOpen}
+        onClose={() => setIsDistributeModalOpen(false)}
+        onDistribute={handleDistribute}
+      />
     </div>
   );
 }
