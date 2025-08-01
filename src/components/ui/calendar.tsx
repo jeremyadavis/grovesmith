@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+// Chevron icons are provided by react-day-picker's default styling
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 

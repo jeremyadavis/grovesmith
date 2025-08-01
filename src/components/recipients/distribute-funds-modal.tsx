@@ -44,8 +44,8 @@ export function DistributeFundsModal({
   onClose,
   onDistribute,
 }: DistributeFundsModalProps) {
-  // Mock undistributed amount (3 weeks worth)
-  const undistributedAmount = recipient.allowance_amount * 3;
+  // Allow testing by creating undistributed funds
+  const [undistributedAmount, setUndistributedAmount] = useState(recipient.allowance_amount * 3);
 
   const [distribution, setDistribution] = useState<CategoryDistribution>({
     give: 0,
@@ -86,9 +86,11 @@ export function DistributeFundsModal({
   const handleSubmit = () => {
     if (totalDistributed > 0) {
       onDistribute(distribution, distributionDate);
+      // Reduce the undistributed amount by what was distributed
+      setUndistributedAmount(prev => Math.max(0, prev - totalDistributed));
       setDistribution({ give: 0, spend: 0, save: 0, invest: 0 });
-      // Keep modal open so user can make another distribution if needed
-      onClose(); // Comment out to allow multiple distributions
+      // Keep modal open for testing multiple distributions
+      // onClose(); // Comment out to allow multiple distributions
     }
   };
 
@@ -99,6 +101,7 @@ export function DistributeFundsModal({
   const handleClose = () => {
     setDistribution({ give: 0, spend: 0, save: 0, invest: 0 });
     setDistributionDate(new Date());
+    setUndistributedAmount(recipient.allowance_amount * 3); // Reset for next test
     onClose();
   };
 
@@ -125,13 +128,34 @@ export function DistributeFundsModal({
 
         {/* Content */}
         <div className="space-y-6 p-6">
-          {/* Available Amount */}
+          {/* Available Amount - Editable for Testing */}
           <div className="rounded-lg bg-blue-50 p-4 text-center">
             <p className="text-sm text-blue-600">Available to Distribute</p>
-            <p className="text-2xl font-bold text-blue-800">
-              ${undistributedAmount.toFixed(2)}
+            <div className="flex items-center justify-center space-x-2 mt-2">
+              <button
+                onClick={() => setUndistributedAmount(Math.max(0, undistributedAmount - recipient.allowance_amount))}
+                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                value={undistributedAmount.toFixed(2)}
+                onChange={(e) => setUndistributedAmount(Math.max(0, parseFloat(e.target.value) || 0))}
+                className="w-32 text-center border border-blue-300 rounded px-2 py-1 text-xl font-bold text-blue-800 bg-white"
+                step={recipient.allowance_amount}
+                min="0"
+              />
+              <button
+                onClick={() => setUndistributedAmount(undistributedAmount + recipient.allowance_amount)}
+                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600"
+              >
+                +
+              </button>
+            </div>
+            <p className="text-xs text-blue-600 mt-2">
+              {Math.floor(undistributedAmount / recipient.allowance_amount)} weeks @ ${recipient.allowance_amount}/week
             </p>
-            <p className="text-xs text-blue-600">3 weeks pending</p>
           </div>
 
           {/* Quick Actions */}

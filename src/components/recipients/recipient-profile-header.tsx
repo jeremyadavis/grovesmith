@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getRecipientTheme } from '@/lib/profile-themes';
 import { DistributeFundsModal } from './distribute-funds-modal';
+import { UndistributedFundsCalculator } from './undistributed-funds-calculator';
 
 interface Recipient {
   id: string;
@@ -65,10 +66,26 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
     router.push(`/recipients/${nextRecipient.id}`);
   };
 
-  const handleDistribute = (distribution: { give: number; spend: number; save: number; invest: number }, date: Date) => {
-    // TODO: Implement actual distribution logic with server action
-    console.log('Distributing:', distribution, 'on date:', date);
-    // For now, just log the distribution - we'll implement the server action later
+  const handleDistribute = async (distribution: { give: number; spend: number; save: number; invest: number }, date: Date) => {
+    try {
+      const { distributeAllowance } = await import('@/lib/distribution-actions');
+      
+      await distributeAllowance({
+        recipientId: recipient.id,
+        distributionDate: date,
+        giveAmount: distribution.give,
+        spendAmount: distribution.spend,
+        saveAmount: distribution.save,
+        investAmount: distribution.invest,
+        notes: `Distribution of $${(distribution.give + distribution.spend + distribution.save + distribution.invest).toFixed(2)}`
+      });
+
+      // Refresh the page to show updated balances
+      window.location.reload();
+    } catch (error) {
+      console.error('Distribution failed:', error);
+      alert('Failed to distribute funds. Please try again.');
+    }
   };
 
   return (
@@ -105,20 +122,36 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
           </h1>
 
           {/* Undistributed Funds */}
-          <div className="flex flex-col items-center space-y-2">
-            <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
-              $ {(recipient.allowance_amount * 3).toFixed(2)} to distribute
-            </p>
-            <p className={`text-sm ${theme.textColor === 'text-gray-800' ? 'text-gray-500' : 'text-gray-600'}`}>
-              3 weeks pending
-            </p>
-            <button 
-              onClick={() => setIsDistributeModalOpen(true)}
-              className="bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-lg text-sm font-medium text-gray-800 hover:bg-white/30 transition-colors"
-            >
-              Distribute Funds
-            </button>
-          </div>
+          <UndistributedFundsCalculator recipientId={recipient.id}>
+            {({ undistributedAmount, weeksPending, isLoading, error }) => (
+              <div className="flex flex-col items-center space-y-2">
+                {isLoading ? (
+                  <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
+                    Calculating...
+                  </p>
+                ) : error ? (
+                  <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-red-600' : 'text-red-700'}`}>
+                    Error loading funds
+                  </p>
+                ) : (
+                  <>
+                    <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
+                      $ {undistributedAmount.toFixed(2)} to distribute
+                    </p>
+                    <p className={`text-sm ${theme.textColor === 'text-gray-800' ? 'text-gray-500' : 'text-gray-600'}`}>
+                      {weeksPending} weeks pending
+                    </p>
+                  </>
+                )}
+                <button 
+                  onClick={() => setIsDistributeModalOpen(true)}
+                  className="bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-lg text-sm font-medium text-gray-800 hover:bg-white/30 transition-colors"
+                >
+                  Distribute Funds
+                </button>
+              </div>
+            )}
+          </UndistributedFundsCalculator>
 
           {/* Trophy carousel */}
           <div className="flex space-x-4 mt-6">
