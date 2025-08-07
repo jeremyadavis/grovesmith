@@ -53,7 +53,7 @@ This document outlines the technical specifications and architecture choices for
 - **managers** (OAuth authenticated users)
 - **recipients** (linked to manager accounts)
 - **allowance_categories** (Give, Spend, Save, Invest)
-- **allowance_transactions** (excluding Spend; tracks fund movement within categories)
+- **transactions** (tracks fund movement within categories via distributions)
 - **wishlists** (recipient-specific wishlist items with progress tracking)
 - **dividends** (records simulated dividend distributions)
 

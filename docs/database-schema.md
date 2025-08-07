@@ -81,33 +81,7 @@ CREATE TABLE allowance_categories (
 
 ---
 
-### 4. `allowance_transactions`
-
-Records all money movements for tracking and history.
-
-```sql
-CREATE TABLE allowance_transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  recipient_id UUID NOT NULL REFERENCES recipients(id) ON DELETE CASCADE,
-  category_type TEXT NOT NULL CHECK (category_type IN ('give', 'spend', 'save', 'invest')),
-  transaction_type TEXT NOT NULL CHECK (transaction_type IN ('allowance', 'adjustment', 'withdrawal', 'dividend')),
-  amount DECIMAL(10,2) NOT NULL,
-  description TEXT,
-  reference_id UUID, -- Links to related records (wishlist items, causes, etc.)
-  created_by UUID REFERENCES managers(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-**Notes:**
-
-- Complete audit trail of all transactions
-- `reference_id` provides flexible linking to causes, wishlist items, etc.
-- Supports different transaction types for proper categorization
-
----
-
-### 5. `save_subcategories`
+### 4. `save_subcategories`
 
 Subcategories within the Save category (Clothes, Books, Toys, etc.).
 
@@ -131,7 +105,7 @@ CREATE TABLE save_subcategories (
 
 ---
 
-### 6. `wishlist_items`
+### 5. `wishlist_items`
 
 Items recipients are saving toward.
 
@@ -162,7 +136,7 @@ CREATE TABLE wishlist_items (
 
 ---
 
-### 7. `investment_settings`
+### 6. `investment_settings`
 
 Configurable investment simulation parameters per recipient.
 
@@ -189,7 +163,7 @@ CREATE TABLE investment_settings (
 
 ---
 
-### 8. `dividend_payments`
+### 7. `dividend_payments`
 
 Historical record of dividend payouts.
 
@@ -219,8 +193,6 @@ CREATE TABLE dividend_payments (
 -- Performance indexes
 CREATE INDEX idx_recipients_manager_id ON recipients(manager_id);
 CREATE INDEX idx_allowance_categories_recipient_id ON allowance_categories(recipient_id);
-CREATE INDEX idx_allowance_transactions_recipient_id ON allowance_transactions(recipient_id);
-CREATE INDEX idx_allowance_transactions_created_at ON allowance_transactions(created_at);
 CREATE INDEX idx_wishlist_items_recipient_id ON wishlist_items(recipient_id);
 CREATE INDEX idx_wishlist_items_status ON wishlist_items(status);
 CREATE INDEX idx_dividend_payments_recipient_id ON dividend_payments(recipient_id);

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, Plus, TrendingUp } from 'lucide-react';
+import { CategoryTransactionHistory } from '../category-transaction-history';
 
 interface Recipient {
   id: string;
@@ -95,6 +96,14 @@ export function SpendCategoryTab({ recipient }: SpendCategoryTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Transaction History */}
+      <CategoryTransactionHistory 
+        recipientId={recipient.id}
+        categoryType="spend"
+        title="Spend History"
+        description="Track of allowance additions to spending money"
+      />
 
       {/* Cash Management Tips */}
       <Card>

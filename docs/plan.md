@@ -144,7 +144,7 @@
 - Automatic manager profile creation on first login
 
 ### Database Setup
-- Core tables: managers, recipients, allowance_categories, allowance_transactions
+- Core tables: managers, recipients, allowance_categories, distributions, transactions
 - Automatic category creation trigger for new recipients
 - Row-level security policies implemented
 - Ready for allowance distribution logic

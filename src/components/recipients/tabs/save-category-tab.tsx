@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PiggyBank, Plus, Target, List } from 'lucide-react';
+import { CategoryTransactionHistory } from '../category-transaction-history';
 
 interface Recipient {
   id: string;
@@ -105,6 +106,14 @@ export function SaveCategoryTab({ recipient }: SaveCategoryTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Transaction History */}
+      <CategoryTransactionHistory 
+        recipientId={recipient.id}
+        categoryType="save"
+        title="Save History"
+        description="Track of savings contributions and withdrawals"
+      />
 
       {/* Savings Tips */}
       <Card>

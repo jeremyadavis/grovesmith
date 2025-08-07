@@ -34,6 +34,7 @@ interface RecipientProfileHeaderProps {
 export function RecipientProfileHeader({ recipient, allRecipients, onCategorySelect, activeCategory = "give" }: RecipientProfileHeaderProps) {
   const router = useRouter();
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
+  const [currentUndistributedAmount, setCurrentUndistributedAmount] = useState(0);
   
   // Get the theme for this recipient
   const theme = getRecipientTheme(recipient.id);
@@ -123,34 +124,41 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
 
           {/* Undistributed Funds */}
           <UndistributedFundsCalculator recipientId={recipient.id}>
-            {({ undistributedAmount, weeksPending, isLoading, error }) => (
-              <div className="flex flex-col items-center space-y-2">
-                {isLoading ? (
-                  <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
-                    Calculating...
-                  </p>
-                ) : error ? (
-                  <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-red-600' : 'text-red-700'}`}>
-                    Error loading funds
-                  </p>
-                ) : (
-                  <>
+            {({ undistributedAmount, weeksPending, isLoading, error }) => {
+              // Update the current undistributed amount when it changes
+              if (!isLoading && !error && undistributedAmount !== currentUndistributedAmount) {
+                setCurrentUndistributedAmount(undistributedAmount);
+              }
+              
+              return (
+                <div className="flex flex-col items-center space-y-2">
+                  {isLoading ? (
                     <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
-                      $ {undistributedAmount.toFixed(2)} to distribute
+                      Calculating...
                     </p>
-                    <p className={`text-sm ${theme.textColor === 'text-gray-800' ? 'text-gray-500' : 'text-gray-600'}`}>
-                      {weeksPending} weeks pending
+                  ) : error ? (
+                    <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-red-600' : 'text-red-700'}`}>
+                      Error loading funds
                     </p>
-                  </>
-                )}
-                <button 
-                  onClick={() => setIsDistributeModalOpen(true)}
-                  className="bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-lg text-sm font-medium text-gray-800 hover:bg-white/30 transition-colors"
-                >
-                  Distribute Funds
-                </button>
-              </div>
-            )}
+                  ) : (
+                    <>
+                      <p className={`text-lg ${theme.textColor === 'text-gray-800' ? 'text-gray-600' : 'text-gray-700'}`}>
+                        $ {undistributedAmount.toFixed(2)} to distribute
+                      </p>
+                      <p className={`text-sm ${theme.textColor === 'text-gray-800' ? 'text-gray-500' : 'text-gray-600'}`}>
+                        {weeksPending} weeks pending
+                      </p>
+                    </>
+                  )}
+                  <button 
+                    onClick={() => setIsDistributeModalOpen(true)}
+                    className="bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-lg text-sm font-medium text-gray-800 hover:bg-white/30 transition-colors"
+                  >
+                    Distribute Funds
+                  </button>
+                </div>
+              );
+            }}
           </UndistributedFundsCalculator>
 
           {/* Trophy carousel */}
@@ -259,6 +267,7 @@ export function RecipientProfileHeader({ recipient, allRecipients, onCategorySel
         isOpen={isDistributeModalOpen}
         onClose={() => setIsDistributeModalOpen(false)}
         onDistribute={handleDistribute}
+        undistributedAmount={currentUndistributedAmount}
       />
     </div>
   );

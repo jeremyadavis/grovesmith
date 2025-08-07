@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Plus } from 'lucide-react';
+import { CategoryTransactionHistory } from '../category-transaction-history';
 
 interface Recipient {
   id: string;
@@ -75,19 +76,12 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
       </Card>
 
       {/* Give History */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Give History</CardTitle>
-          <CardDescription>
-            Track of all charitable contributions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p>No contributions yet</p>
-          </div>
-        </CardContent>
-      </Card>
+      <CategoryTransactionHistory 
+        recipientId={recipient.id}
+        categoryType="give"
+        title="Give History"
+        description="Track of all charitable contributions and allowance additions"
+      />
     </div>
   );
 }

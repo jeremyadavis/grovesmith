@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Gift, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ interface DistributeFundsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDistribute: (distribution: CategoryDistribution, date: Date) => void;
+  undistributedAmount: number;
 }
 
 interface CategoryDistribution {
@@ -43,9 +44,9 @@ export function DistributeFundsModal({
   isOpen,
   onClose,
   onDistribute,
+  undistributedAmount: initialUndistributedAmount,
 }: DistributeFundsModalProps) {
-  // Allow testing by creating undistributed funds
-  const [undistributedAmount, setUndistributedAmount] = useState(recipient.allowance_amount * 3);
+  const [availableAmount, setAvailableAmount] = useState(initialUndistributedAmount);
 
   const [distribution, setDistribution] = useState<CategoryDistribution>({
     give: 0,
@@ -56,17 +57,22 @@ export function DistributeFundsModal({
 
   const [distributionDate, setDistributionDate] = useState<Date>(new Date());
 
+  // Update available amount when prop changes
+  useEffect(() => {
+    setAvailableAmount(initialUndistributedAmount);
+  }, [initialUndistributedAmount]);
+
   const totalDistributed = Object.values(distribution).reduce(
     (sum, amount) => sum + amount,
     0
   );
-  const remaining = undistributedAmount - totalDistributed;
+  const remaining = availableAmount - totalDistributed;
 
   const handleDistribute = (
     category: keyof CategoryDistribution,
     amount: number
   ) => {
-    const newAmount = Math.max(0, Math.min(amount, undistributedAmount));
+    const newAmount = Math.max(0, Math.min(amount, availableAmount));
     setDistribution((prev) => ({
       ...prev,
       [category]: newAmount,
@@ -74,7 +80,7 @@ export function DistributeFundsModal({
   };
 
   const handleQuickDistribute = () => {
-    const equalAmount = undistributedAmount / 4;
+    const equalAmount = availableAmount / 4;
     setDistribution({
       give: equalAmount,
       spend: equalAmount,
@@ -86,11 +92,8 @@ export function DistributeFundsModal({
   const handleSubmit = () => {
     if (totalDistributed > 0) {
       onDistribute(distribution, distributionDate);
-      // Reduce the undistributed amount by what was distributed
-      setUndistributedAmount(prev => Math.max(0, prev - totalDistributed));
       setDistribution({ give: 0, spend: 0, save: 0, invest: 0 });
-      // Keep modal open for testing multiple distributions
-      // onClose(); // Comment out to allow multiple distributions
+      onClose();
     }
   };
 
@@ -101,7 +104,7 @@ export function DistributeFundsModal({
   const handleClose = () => {
     setDistribution({ give: 0, spend: 0, save: 0, invest: 0 });
     setDistributionDate(new Date());
-    setUndistributedAmount(recipient.allowance_amount * 3); // Reset for next test
+    setAvailableAmount(initialUndistributedAmount);
     onClose();
   };
 
@@ -128,33 +131,22 @@ export function DistributeFundsModal({
 
         {/* Content */}
         <div className="space-y-6 p-6">
-          {/* Available Amount - Editable for Testing */}
+          {/* Available Amount */}
           <div className="rounded-lg bg-blue-50 p-4 text-center">
             <p className="text-sm text-blue-600">Available to Distribute</p>
             <div className="flex items-center justify-center space-x-2 mt-2">
-              <button
-                onClick={() => setUndistributedAmount(Math.max(0, undistributedAmount - recipient.allowance_amount))}
-                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600"
-              >
-                -
-              </button>
+              <span className="text-2xl font-bold text-blue-800">$</span>
               <input
                 type="number"
-                value={undistributedAmount.toFixed(2)}
-                onChange={(e) => setUndistributedAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-32 text-center border border-blue-300 rounded px-2 py-1 text-xl font-bold text-blue-800 bg-white"
-                step={recipient.allowance_amount}
+                value={availableAmount.toFixed(2)}
+                onChange={(e) => setAvailableAmount(Math.max(0, parseFloat(e.target.value) || 0))}
+                className="w-32 text-center border border-blue-300 rounded px-2 py-1 text-2xl font-bold text-blue-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                step="0.25"
                 min="0"
               />
-              <button
-                onClick={() => setUndistributedAmount(undistributedAmount + recipient.allowance_amount)}
-                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600"
-              >
-                +
-              </button>
             </div>
             <p className="text-xs text-blue-600 mt-2">
-              {Math.floor(undistributedAmount / recipient.allowance_amount)} weeks @ ${recipient.allowance_amount}/week
+              Default: ${initialUndistributedAmount.toFixed(2)} ({Math.floor(initialUndistributedAmount / recipient.allowance_amount)} weeks @ ${recipient.allowance_amount}/week)
             </p>
           </div>
 
@@ -212,7 +204,7 @@ export function DistributeFundsModal({
                   className="w-20 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                   step="0.25"
                   min="0"
-                  max={undistributedAmount}
+                  max={availableAmount}
                 />
                 <button
                   onClick={() =>
@@ -260,7 +252,7 @@ export function DistributeFundsModal({
                   className="w-20 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                   step="0.25"
                   min="0"
-                  max={undistributedAmount}
+                  max={availableAmount}
                 />
                 <button
                   onClick={() =>
@@ -308,7 +300,7 @@ export function DistributeFundsModal({
                   className="w-20 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                   step="0.25"
                   min="0"
-                  max={undistributedAmount}
+                  max={availableAmount}
                 />
                 <button
                   onClick={() =>
@@ -366,7 +358,7 @@ export function DistributeFundsModal({
                   className="w-20 rounded border border-gray-300 px-2 py-1 text-center text-sm"
                   step="0.25"
                   min="0"
-                  max={undistributedAmount}
+                  max={availableAmount}
                 />
                 <button
                   onClick={() =>
