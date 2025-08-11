@@ -1,58 +1,41 @@
 # Grovesmith
 
-A financial literacy web application designed to teach children responsible money management through structured allowance distribution across educational categories.
+A financial literacy web application that teaches children responsible money management through structured allowance distribution across four educational categories.
 
-## Overview
+## Mission
 
-Grovesmith helps parents manage their children's allowances by distributing money across four educational categories:
-- **Give** - Teaching charitable giving and purposeful donations
-- **Spend** - Providing spending money for learning financial transactions
-- **Save** - Building saving habits toward specific goals
-- **Invest** - Teaching investment principles through dividend simulation
+Help children develop healthy financial habits by learning to allocate their allowance across Give (charity), Spend (discretionary), Save (goals), and Invest (growth) categories through hands-on experience and guided learning.
+
+## Key Features
+
+✅ **Complete Allowance Management**
+- Pooled distribution system with flexible timing
+- Automatic balance tracking and transaction history
+- Manager-controlled with educational transparency
+
+✅ **Give Category (Implemented)**
+- Up to 3 charitable causes per child
+- Fund allocation system with donation completion
+- Visual progress tracking and impact celebration
+
+✅ **Gamification & Personalization**
+- 7-trophy achievement system tied to real financial milestones
+- 10 unique recipient themes for visual personalization
+- Progress recognition without artificial point systems
+
+🔄 **Coming Next: Save, Spend & Invest Categories**
+- Save: Wishlist management with subcategories and goal tracking
+- Spend: Privacy-focused spending reflection without surveillance
+- Invest: Dividend simulation leading to real investment accounts
 
 ## Technology Stack
 
-- **Frontend:** Next.js 15, React 19, TypeScript
-- **Styling:** Tailwind CSS, shadcn/ui components
-- **Backend:** Supabase (PostgreSQL, Authentication)
-- **Deployment:** Vercel (Frontend), Supabase Cloud (Backend)
+- **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Authentication, Row-Level Security)
+- **Deployment:** Vercel + Supabase Cloud
+- **Architecture:** Server-side rendering, server actions, real-time updates
 
-## Current Features
-
-✅ **Authentication System**
-- Manager-only email authentication
-- Server-side rendering with proper session handling
-- Protected routes with middleware
-
-✅ **Dashboard & Recipients**
-- Manager dashboard with recipient overview
-- Add recipients with custom allowance amounts
-- Automatic category creation for new recipients
-
-✅ **Recipient Profile System**
-- Individual recipient profile pages with personalized themes
-- Circular navigation between recipients with pagination dots
-- 10 unique gradient themes assigned deterministically per child
-- Trophy achievement system with 7 different trophy types
-
-✅ **Distribution System**
-- Manual allowance distribution with pooled undistributed funds
-- Interactive distribution modal with category allocation controls
-- Date picker for backdating distributions to specific dates
-- Real-time calculation of undistributed allowance amounts
-- Multiple distributions per session with running balance updates
-
-✅ **Gamification Features**
-- Dynamic trophy awards based on category balances
-- Achievement system (First Saver, Generous Giver, Smart Investor, etc.)
-- Visual trophy display with earned/unearned states
-- Profile personalization with themed headers
-
-✅ **Database Foundation**
-- Complete schema for managers, recipients, categories, and transactions
-- Distribution and transaction tracking with full audit trail
-- Row-level security policies and automatic triggers
-- Real-time balance updates via database functions
+> See [README.tech-stack.md](README.tech-stack.md) for detailed technical specifications
 
 ## Getting Started
 
@@ -60,107 +43,78 @@ Grovesmith helps parents manage their children's allowances by distributing mone
 - Node.js 18+
 - Supabase account
 
-### Installation
-
-1. Clone the repository
+### Quick Start
 ```bash
+# 1. Clone and install
 git clone https://github.com/your-username/grovesmith.git
 cd grovesmith
-```
-
-2. Install dependencies
-```bash
 npm install
-```
 
-3. Set up environment variables
-```bash
+# 2. Environment setup
 cp .env.local.example .env.local
-```
-Add your Supabase project URL and anon key to `.env.local`
+# Add your Supabase URL and anon key to .env.local
 
-4. Set up the database
-- Go to your Supabase project dashboard
-- Navigate to SQL Editor
-- Run the commands from `supabase-setup.sql`
+# 3. Database setup
+# Run supabase-setup.sql in your Supabase SQL Editor
 
-5. Start the development server
-```bash
+# 4. Start development
 npm run dev
 ```
 
 Visit `http://localhost:3000` to see the application.
 
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js app router
-│   ├── dashboard/         # Main dashboard page
-│   ├── recipients/[id]/   # Dynamic recipient profile pages
-│   ├── login/            # Authentication page
-│   └── layout.tsx        # Root layout
-├── components/           # Reusable UI components
-│   ├── auth/            # Authentication components
-│   ├── dashboard/       # Dashboard-specific components
-│   ├── layout/          # App-wide layout components
-│   ├── recipients/      # Recipient profile components
-│   │   ├── distribute-funds-modal.tsx
-│   │   ├── recipient-profile-header.tsx
-│   │   ├── trophy-system.tsx
-│   │   └── tabs/        # Category tab components
-│   └── ui/              # shadcn/ui components (calendar, popover, etc.)
-├── lib/                 # Utility functions and configurations
-│   ├── auth-actions.ts  # Server actions for authentication
-│   ├── distribution-actions.ts # Server actions for distributions
-│   ├── profile-themes.ts # Theme system for personalization
-│   ├── auth.ts         # Authentication utilities
-│   └── supabase/       # Supabase client configurations
-└── middleware.ts       # Route protection middleware
+### Development Commands
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run format       # Format with Prettier
 ```
 
-## Development Roadmap
+## Project Documentation
 
-### Phase 1: Foundation ✅
-- Next.js setup with TypeScript and Tailwind
-- Supabase integration with authentication
-- Database schema design
+### Product Requirements
+- **[Product Overview](README.product-overview.md)** - Core philosophy and educational approach
+- **[Distribution System](README.product-distribution.md)** - Allowance distribution features
+- **[Give Category](README.product-give.md)** - Charitable giving implementation ✅
+- **[Spend Category](README.product-spend.md)** - Privacy-focused spending tracking 🔄
+- **[Save Category](README.product-save.md)** - Goal-oriented saving with wishlists 🔄
+- **[Invest Category](README.product-invest.md)** - Investment simulation system 🔄
+- **[Trophy System](README.product-trophies.md)** - Gamification and achievements ✅
 
-### Phase 2: Authentication & Navigation ✅
-- Server-side authentication with proper cookie handling
-- Protected routes and middleware
-- Basic dashboard layout
+### Technical Implementation
+- **[Core Data Models](README.data-model-core.md)** - Users, recipients, categories
+- **[Distribution Data](README.data-model-distribution.md)** - Transaction and balance systems
+- **[Category Data Models](README.data-model-give.md)** - Domain-specific data structures
+- **[Database Schema](README.database-schema.md)** - Complete schema design
+- **[Tech Stack](README.tech-stack.md)** - Architecture and technology choices
 
-### Phase 3: Recipient Management ✅
-- Manager dashboard with recipient cards
-- Add/edit recipients functionality
-- Automatic category initialization
+## Current Status
 
-### Phase 4: Allowance Distribution ✅
-- Manual allowance distribution with pooled funds
-- Interactive distribution modal with real-time validation
-- Date picker for historical distributions
-- Automatic balance updates and transaction logging
+**Phase 5 Complete: Give Category Features**
+- ✅ Charitable causes with fund allocation
+- ✅ Three-tier balance system (total, allocated, unallocated)  
+- ✅ Donation completion with transaction recording
+- ✅ Visual progress tracking and status indicators
 
-### Phase 5: Category Features (Next)
-- Give category with charitable causes and giving goals
-- Save category with wishlist management and progress tracking
-- Investment simulation with dividend payments and thresholds
-- Spend category with transaction history and reflection tools
+**Next Development Priority:**
+- Save category with wishlist management and subcategories
+- Spend category with reflection tools and contribution tracking  
+- Invest category with dividend simulation and milestone achievements
 
-### Phase 6: Advanced Features (Planned)
-- Auto-distribution with saved percentage preferences
-- Manager settings and recipient configuration
-- Historical reporting and analytics
-- Mobile-responsive optimizations
+## Educational Philosophy
+
+Grovesmith emphasizes **learning through experience** rather than chore-based rewards:
+
+- **Manager-Controlled:** Parents maintain oversight while children learn through guided experience
+- **Real Consequences:** Financial decisions have actual outcomes within a safe learning environment  
+- **Balanced Approach:** Equal emphasis on giving, spending, saving, and investing
+- **Privacy-Respectful:** No surveillance of individual purchases or personal choices
+- **Achievement-Based:** Recognition tied to genuine financial milestones and positive behaviors
 
 ## Contributing
 
-This is currently a personal project. Please refer to the development plan in `docs/plan.md` for detailed implementation status and next steps.
-
-## License
-
-This project is private and not currently open for public contribution.
+This is currently a personal project focused on family financial education. The codebase follows clean architecture principles with comprehensive documentation to support future development and potential open-source release.
 
 ---
 
