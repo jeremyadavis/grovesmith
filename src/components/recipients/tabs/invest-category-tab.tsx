@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Plus, DollarSign, Calendar, Target } from 'lucide-react';
-import { CategoryTransactionHistory } from '../category-transaction-history';
 
 interface Recipient {
   id: string;
@@ -123,13 +122,6 @@ export function InvestCategoryTab({ recipient }: InvestCategoryTabProps) {
         </CardContent>
       </Card>
 
-      {/* Transaction History */}
-      <CategoryTransactionHistory 
-        recipientId={recipient.id}
-        categoryType="invest"
-        title="Investment History"
-        description="Track of investments and dividend payments"
-      />
 
       {/* Investment Education */}
       <Card>

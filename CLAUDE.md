@@ -93,6 +93,13 @@ src/
 - ✅ Trophy/achievement system with 7 trophy types
 - ✅ Interactive distribution modal with date picker
 - ✅ Real-time balance calculations and transaction history
+- ✅ **Give Category Features**:
+  - Up to 3 charitable causes per recipient
+  - Fund allocation system (unallocated → allocated to specific causes)
+  - Donation completion with transaction recording
+  - Three-tier balance display (total unspent, allocated, unallocated)
+  - Visual progress indicators and status badges
+  - Full-width category header with transaction history in sidebar
 
 ### Development Notes
 - Uses Turbopack for faster development builds
@@ -102,9 +109,10 @@ src/
 - Middleware logs auth state in development for debugging
 
 ### Database Schema
-Key tables: `managers`, `recipients`, `allowance_categories`, `distributions`, `transactions`
+Key tables: `managers`, `recipients`, `allowance_categories`, `distributions`, `transactions`, `charitable_causes`
 - Recipients have 4 auto-created categories: Give, Spend, Save, Invest
 - Distributions create transaction records via database triggers
+- Charitable causes track allocated funds and completion status
 - Row-Level Security ensures data isolation between managers
 
 ## Project Goals & Vision (per docs/prd.md)
@@ -123,7 +131,7 @@ Key tables: `managers`, `recipients`, `allowance_categories`, `distributions`, `
 - Gamification through achievements and personalized themes
 
 ### Current Development Phase (per docs/plan.md)
-Currently in **Phase 4-5: Distribution System Complete** - allowance distribution with pooled undistributed funds is implemented. Next phase focuses on category-specific features:
+Currently in **Phase 5 Complete: Give Category Features** - complete charitable giving system with fund allocation and donation tracking is implemented. Next phase focuses on remaining category features:
 
-**✅ Completed**: Authentication, recipient management, distribution system, trophy gamification, themed profiles
-**🔄 Next**: Category features (Give causes, Save wishlists, Spend tracking, Investment simulation)
+**✅ Completed**: Authentication, recipient management, distribution system, trophy gamification, themed profiles, Give category with charitable causes
+**🔄 Next**: Save category wishlists, Spend tracking, Investment simulation
