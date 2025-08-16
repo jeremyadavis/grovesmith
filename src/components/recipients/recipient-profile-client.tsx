@@ -34,8 +34,13 @@ interface RecipientProfileClientProps {
   managerEmail?: string;
 }
 
-export function RecipientProfileClient({ recipient, allRecipients, managerName, managerEmail }: RecipientProfileClientProps) {
-  const [activeTab, setActiveTab] = useState("give");
+export function RecipientProfileClient({
+  recipient,
+  allRecipients,
+  managerName,
+  managerEmail,
+}: RecipientProfileClientProps) {
+  const [activeTab, setActiveTab] = useState('give');
 
   // Handle category selection from the header
   const handleCategorySelect = (category: string) => {
@@ -45,60 +50,72 @@ export function RecipientProfileClient({ recipient, allRecipients, managerName, 
   return (
     <div className="min-h-screen bg-gray-50">
       <AppHeader managerName={managerName} managerEmail={managerEmail} />
-      <RecipientProfileHeader 
+      <RecipientProfileHeader
         recipient={recipient}
         allRecipients={allRecipients}
         onCategorySelect={handleCategorySelect}
         activeCategory={activeTab}
       />
-      
+
       <main className="container mx-auto px-4 py-8">
-        {activeTab === "give" ? (
+        {activeTab === 'give' ? (
           /* Give category: Full-width header with traditional sidebar below */
           <div className="space-y-8">
             {/* Full-width category header */}
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-8 text-white">
+            <div className="rounded-lg bg-gradient-to-r from-green-500 to-green-600 p-8 text-white">
               <div className="flex items-center space-x-4">
-                <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                <div className="rounded-full bg-white/20 p-4 backdrop-blur-sm">
                   <Heart className="h-8 w-8 text-white" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">Give Category</h1>
-                  <p className="text-green-100 mt-2 text-lg">
+                  <p className="mt-2 text-lg text-green-100">
                     Money set aside for charitable giving and meaningful causes
                   </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Content area with sidebar */}
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 gap-8 xl:grid-cols-4">
               {/* Main content area */}
               <div className="xl:col-span-3">
                 <GiveCategoryTab recipient={recipient} />
               </div>
-              
+
               {/* Settings sidebar */}
               <div className="xl:col-span-1">
-                <RecipientSettings recipient={recipient} activeCategory={activeTab} />
+                <RecipientSettings
+                  recipient={recipient}
+                  activeCategory={activeTab}
+                />
               </div>
             </div>
           </div>
         ) : (
           /* Other categories: Traditional sidebar layout */
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 gap-8 xl:grid-cols-4">
             {/* Main content area */}
             <div className="xl:col-span-3">
               <div className="space-y-6">
-                {activeTab === "spend" && <SpendCategoryTab recipient={recipient} />}
-                {activeTab === "save" && <SaveCategoryTab recipient={recipient} />}
-                {activeTab === "invest" && <InvestCategoryTab recipient={recipient} />}
+                {activeTab === 'spend' && (
+                  <SpendCategoryTab recipient={recipient} />
+                )}
+                {activeTab === 'save' && (
+                  <SaveCategoryTab recipient={recipient} />
+                )}
+                {activeTab === 'invest' && (
+                  <InvestCategoryTab recipient={recipient} />
+                )}
               </div>
             </div>
-            
+
             {/* Settings sidebar */}
             <div className="xl:col-span-1">
-              <RecipientSettings recipient={recipient} activeCategory={activeTab} />
+              <RecipientSettings
+                recipient={recipient}
+                activeCategory={activeTab}
+              />
             </div>
           </div>
         )}

@@ -3,13 +3,16 @@ import { redirect } from 'next/navigation';
 
 export async function getUser() {
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
   if (error) {
     console.error('Auth error:', error);
     return null;
   }
-  
+
   return user;
 }
 
@@ -22,9 +25,13 @@ export async function requireAuth() {
   return user;
 }
 
-export async function createManagerProfile(user: { id: string; email?: string; user_metadata?: { full_name?: string } }) {
+export async function createManagerProfile(user: {
+  id: string;
+  email?: string;
+  user_metadata?: { full_name?: string };
+}) {
   const supabase = await createClient();
-  
+
   const { data, error } = await supabase
     .from('managers')
     .upsert({

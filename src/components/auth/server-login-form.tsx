@@ -5,7 +5,13 @@ import { signIn, signUp } from '@/lib/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export function ServerLoginForm() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -54,15 +60,10 @@ export function ServerLoginForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              required
-            />
+            <Input id="password" name="password" type="password" required />
           </div>
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+            <div className="rounded bg-red-50 p-2 text-sm text-red-600">
               {error}
             </div>
           )}

@@ -19,9 +19,11 @@ Recipients (1) ──── (1) Investment Settings
 ## Core Entities
 
 ### Investment Settings Entity
+
 Configurable parameters controlling each recipient's investment simulation experience.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for settings identification
 - `recipient_id` - Foreign key linking to recipient (one-to-one relationship)
 - `dividend_rate` - Decimal rate for dividend calculation (default: 0.0500 for 5%)
@@ -34,6 +36,7 @@ Configurable parameters controlling each recipient's investment simulation exper
 - `updated_at` - Last settings modification
 
 **Business Rules:**
+
 - Exactly one investment settings record per recipient
 - Dividend rate must be positive and reasonable (0.01% to 10%)
 - Payout threshold must be positive and achievable ($10 to $1000 range)
@@ -41,11 +44,12 @@ Configurable parameters controlling each recipient's investment simulation exper
 - Settings can be customized per recipient to match learning goals and family preferences
 
 **Payout Schedule Examples:**
+
 ```json
 // Biweekly on 1st and 15th
 {"days": [1, 15]}
 
-// Weekly on Fridays  
+// Weekly on Fridays
 {"days": [5]}
 
 // Monthly on 1st
@@ -56,9 +60,11 @@ Configurable parameters controlling each recipient's investment simulation exper
 ```
 
 ### Dividend Payments Entity
+
 Historical record of all dividend calculations and payments.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for dividend payment identification
 - `recipient_id` - Foreign key linking to recipient who received dividend
 - `principal_amount` - Invest category balance when dividend was calculated
@@ -68,6 +74,7 @@ Historical record of all dividend calculations and payments.
 - `created_at` - When dividend record was created
 
 **Business Rules:**
+
 - Dividend amount = principal amount × dividend rate
 - Principal amount captured at time of dividend calculation
 - Rate preserved for historical accuracy (settings may change over time)
@@ -75,10 +82,11 @@ Historical record of all dividend calculations and payments.
 - Complete historical record enables compound growth visualization
 
 **Calculation Examples:**
+
 ```typescript
 // Biweekly 5% dividend calculation
-const principalAmount = 20.00;  // Current Invest balance
-const dividendRate = 0.0500;    // 5% rate
+const principalAmount = 20.0; // Current Invest balance
+const dividendRate = 0.05; // 5% rate
 const dividend = principalAmount * dividendRate; // $1.00
 
 // New balance after dividend
@@ -86,9 +94,11 @@ const newBalance = principalAmount + dividend; // $21.00
 ```
 
 ### Investment Milestones Entity
+
 Records of significant investment achievements and real investment transitions.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for milestone identification
 - `recipient_id` - Foreign key linking to recipient who achieved milestone
 - `milestone_amount` - Dollar amount that triggered the milestone
@@ -100,20 +110,24 @@ Records of significant investment achievements and real investment transitions.
 - `created_at` - When milestone record was created
 
 **Business Rules:**
+
 - Milestones triggered automatically when thresholds are reached
 - Multiple milestone types support different achievement recognition
 - Stock purchase information helps track real investment progression
 - Milestone achievements can trigger trophy awards or special recognition
 
 **Milestone Types:**
+
 - **threshold_reached:** Invest balance reached payout threshold (e.g., $50)
 - **real_investment_made:** Actual stock purchase completed with milestone funds
 - **portfolio_milestone:** Significant real portfolio achievements (e.g., $500 total invested)
 
 ### Real Investment Tracking Entity (Future Enhancement)
+
 Records of actual investments made with milestone funds.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for investment record identification
 - `recipient_id` - Foreign key linking to recipient who owns investment
 - `milestone_id` - Foreign key linking to triggering milestone
@@ -127,14 +141,16 @@ Records of actual investments made with milestone funds.
 - `notes` - Optional notes about investment choice or reasoning
 
 **Performance Tracking:**
+
 - **Total Investment:** Purchase price × shares
-- **Current Value:** Current price × shares  
+- **Current Value:** Current price × shares
 - **Gain/Loss:** Current value - total investment
 - **Percentage Return:** (Current value / total investment - 1) × 100
 
 ## Database Schema Implementation
 
 ### Investment Settings Table
+
 ```sql
 CREATE TABLE investment_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -147,12 +163,13 @@ CREATE TABLE investment_settings (
   last_dividend_date DATE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE(recipient_id)
 );
 ```
 
 ### Dividend Payments Table
+
 ```sql
 CREATE TABLE dividend_payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -166,6 +183,7 @@ CREATE TABLE dividend_payments (
 ```
 
 ### Investment Milestones Table
+
 ```sql
 CREATE TABLE investment_milestones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -181,6 +199,7 @@ CREATE TABLE investment_milestones (
 ```
 
 ### Real Investment Tracking Table (Future)
+
 ```sql
 CREATE TABLE real_investments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -201,6 +220,7 @@ CREATE TABLE real_investments (
 ## Core Investment Operations
 
 ### Dividend Calculation and Payment
+
 ```sql
 CREATE OR REPLACE FUNCTION process_dividend_payment(
   p_recipient_id UUID,
@@ -214,39 +234,39 @@ DECLARE
 BEGIN
   -- Get investment settings
   SELECT * INTO v_settings
-  FROM investment_settings 
+  FROM investment_settings
   WHERE recipient_id = p_recipient_id AND is_active = true;
-  
+
   IF NOT FOUND THEN
     RAISE EXCEPTION 'No active investment settings found for recipient';
   END IF;
-  
+
   -- Get current Invest category balance
   SELECT balance INTO v_principal
-  FROM allowance_categories 
+  FROM allowance_categories
   WHERE recipient_id = p_recipient_id AND category_type = 'invest';
-  
+
   -- Calculate dividend
   v_dividend_rate := v_settings.dividend_rate;
   v_dividend_amount := v_principal * v_dividend_rate;
-  
+
   -- Only process if dividend amount is meaningful (> $0.01)
   IF v_dividend_amount >= 0.01 THEN
     -- Update Invest category balance
-    UPDATE allowance_categories 
+    UPDATE allowance_categories
     SET balance = balance + v_dividend_amount,
         updated_at = NOW()
     WHERE recipient_id = p_recipient_id AND category_type = 'invest';
-    
+
     -- Record dividend payment
     INSERT INTO dividend_payments (
-      recipient_id, principal_amount, dividend_rate, 
+      recipient_id, principal_amount, dividend_rate,
       dividend_amount, payout_date
     ) VALUES (
       p_recipient_id, v_principal, v_dividend_rate,
       v_dividend_amount, p_payout_date
     );
-    
+
     -- Create dividend transaction
     INSERT INTO transactions (
       recipient_id, category_type, transaction_type, amount,
@@ -257,20 +277,21 @@ BEGIN
       'Dividend payment: $' || v_dividend_amount || ' on $' || v_principal,
       p_payout_date
     );
-    
+
     -- Update last dividend date
     UPDATE investment_settings
     SET last_dividend_date = p_payout_date,
         updated_at = NOW()
     WHERE recipient_id = p_recipient_id;
   END IF;
-  
+
   RETURN v_dividend_amount;
 END;
 $$ LANGUAGE plpgsql;
 ```
 
 ### Milestone Achievement Processing
+
 ```sql
 CREATE OR REPLACE FUNCTION check_investment_milestone(
   p_recipient_id UUID
@@ -282,21 +303,21 @@ DECLARE
 BEGIN
   -- Get current Invest balance
   SELECT balance INTO v_current_balance
-  FROM allowance_categories 
+  FROM allowance_categories
   WHERE recipient_id = p_recipient_id AND category_type = 'invest';
-  
+
   -- Get threshold from settings
   SELECT payout_threshold INTO v_threshold
-  FROM investment_settings 
+  FROM investment_settings
   WHERE recipient_id = p_recipient_id;
-  
+
   -- Check if milestone already exists for this threshold
   SELECT COUNT(*) INTO v_existing_milestone_count
   FROM investment_milestones
-  WHERE recipient_id = p_recipient_id 
+  WHERE recipient_id = p_recipient_id
     AND milestone_amount = v_threshold
     AND milestone_type = 'threshold_reached';
-  
+
   -- Create milestone if threshold reached and not already recorded
   IF v_current_balance >= v_threshold AND v_existing_milestone_count = 0 THEN
     INSERT INTO investment_milestones (
@@ -304,13 +325,13 @@ BEGIN
       milestone_type, description
     ) VALUES (
       p_recipient_id, v_threshold, CURRENT_DATE,
-      'threshold_reached', 
+      'threshold_reached',
       'Reached $' || v_threshold || ' investment milestone - ready for real investing!'
     );
-    
+
     RETURN TRUE;
   END IF;
-  
+
   RETURN FALSE;
 END;
 $$ LANGUAGE plpgsql;
@@ -319,9 +340,10 @@ $$ LANGUAGE plpgsql;
 ## Query Patterns & Performance
 
 ### Investment Performance Queries
+
 ```sql
 -- Investment growth over time
-SELECT 
+SELECT
   DATE_TRUNC('month', dp.payout_date) as month,
   AVG(dp.principal_amount) as avg_principal,
   SUM(dp.dividend_amount) as monthly_dividends,
@@ -334,7 +356,7 @@ ORDER BY month;
 
 -- Compound growth calculation
 WITH growth_timeline AS (
-  SELECT 
+  SELECT
     payout_date,
     principal_amount,
     dividend_amount,
@@ -343,7 +365,7 @@ WITH growth_timeline AS (
   WHERE recipient_id = $1
   ORDER BY payout_date
 )
-SELECT 
+SELECT
   payout_date,
   principal_amount,
   cumulative_dividends,
@@ -352,11 +374,12 @@ FROM growth_timeline;
 ```
 
 ### Milestone and Achievement Queries
+
 ```sql
 -- Investment milestone history
-SELECT 
+SELECT
   im.*,
-  CASE 
+  CASE
     WHEN im.milestone_type = 'threshold_reached' THEN 'Ready for Real Investment'
     WHEN im.milestone_type = 'real_investment_made' THEN 'Stock Purchase Completed'
     WHEN im.milestone_type = 'portfolio_milestone' THEN 'Portfolio Achievement'
@@ -366,11 +389,11 @@ WHERE im.recipient_id = $1
 ORDER BY im.achievement_date DESC;
 
 -- Next milestone progress
-SELECT 
+SELECT
   is_settings.payout_threshold as next_milestone,
   ac.balance as current_balance,
   is_settings.payout_threshold - ac.balance as amount_needed,
-  CASE 
+  CASE
     WHEN ac.balance >= is_settings.payout_threshold THEN 'Milestone Reached!'
     ELSE ROUND((ac.balance / is_settings.payout_threshold * 100), 1) || '% Complete'
   END as progress_status
@@ -380,6 +403,7 @@ WHERE is_settings.recipient_id = $1 AND ac.category_type = 'invest';
 ```
 
 ### Performance Indexes
+
 ```sql
 -- Core relationship indexes
 CREATE INDEX idx_investment_settings_recipient_id ON investment_settings(recipient_id);
@@ -396,9 +420,10 @@ CREATE INDEX idx_milestones_recipient_date ON investment_milestones(recipient_id
 ## Educational Data Analysis
 
 ### Investment Learning Metrics
+
 ```sql
 -- Investment consistency analysis
-SELECT 
+SELECT
   r.id,
   r.name,
   COUNT(dp.id) as total_dividends_received,
@@ -412,7 +437,7 @@ WHERE ac.category_type = 'invest' AND r.manager_id = auth.uid()
 GROUP BY r.id, r.name;
 
 -- Compound growth demonstration
-SELECT 
+SELECT
   recipient_id,
   MIN(payout_date) as first_dividend,
   MAX(payout_date) as latest_dividend,
@@ -427,6 +452,7 @@ GROUP BY recipient_id;
 ```
 
 ### Investment Behavior Insights
+
 - **Consistency Patterns:** How regularly children allocate funds to investment vs other categories
 - **Milestone Motivation:** Whether approaching milestones increases investment allocation
 - **Patience Development:** Time between investment start and first milestone achievement
@@ -435,22 +461,26 @@ GROUP BY recipient_id;
 ## Integration Points
 
 ### Distribution System
+
 - **Investment Funding:** Allowance distributions to Invest category provide principal for dividend calculations
 - **Balance Growth:** Dividend payments increase Invest category balance automatically
 - **Milestone Triggers:** Balance updates check for milestone achievements
 
 ### Trophy System
+
 - **Smart Investor Trophy:** Recognition for first investment category participation
 - **Investment Milestones:** Special achievements for reaching significant investment thresholds
 - **Long-term Recognition:** Trophies for sustained investment behavior over time
 
 ### Real-World Transition
+
 - **UGMA/UTMA Integration:** Milestone achievements trigger real investment account opening
 - **Stock Selection Education:** Children participate in choosing actual stocks with milestone funds
 - **Portfolio Tracking:** Long-term tracking of real investment performance vs simulation
 - **Financial Literacy:** Connection between investment simulation and real market concepts
 
 ### Family Education
+
 - **Compound Growth Visualization:** Charts showing how money grows over time through reinvestment
 - **Milestone Celebrations:** Recognition events when children reach investment thresholds
 - **Investment Discussions:** Dividend payments provide regular opportunities for investment education

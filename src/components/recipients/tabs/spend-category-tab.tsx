@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, Plus, TrendingUp } from 'lucide-react';
 
@@ -38,10 +44,12 @@ export function SpendCategoryTab({ recipient }: SpendCategoryTabProps) {
               <p className="text-2xl font-bold text-blue-700">
                 ${recipient.categories.spend.toFixed(2)}
               </p>
-              <p className="text-sm text-gray-600">Total contributed (lifetime)</p>
+              <p className="text-sm text-gray-600">
+                Total contributed (lifetime)
+              </p>
             </div>
             <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Money
             </Button>
           </div>
@@ -49,7 +57,7 @@ export function SpendCategoryTab({ recipient }: SpendCategoryTabProps) {
       </Card>
 
       {/* Spending Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
@@ -90,12 +98,14 @@ export function SpendCategoryTab({ recipient }: SpendCategoryTabProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p>Spending insights will appear here as {recipient.name} uses their spend money</p>
+          <div className="py-8 text-center text-gray-500">
+            <p>
+              Spending insights will appear here as {recipient.name} uses their
+              spend money
+            </p>
           </div>
         </CardContent>
       </Card>
-
 
       {/* Cash Management Tips */}
       <Card>
@@ -105,19 +115,19 @@ export function SpendCategoryTab({ recipient }: SpendCategoryTabProps) {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-blue-500"></div>
               <p className="text-sm text-gray-700">
                 Practice counting money before going to the store
               </p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-blue-500"></div>
               <p className="text-sm text-gray-700">
                 Learn to check receipts and count change
               </p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-blue-500"></div>
               <p className="text-sm text-gray-700">
                 Think before buying: &quot;Do I really want this?&quot;
               </p>

@@ -46,7 +46,9 @@ export function DistributeFundsModal({
   onDistribute,
   undistributedAmount: initialUndistributedAmount,
 }: DistributeFundsModalProps) {
-  const [availableAmount, setAvailableAmount] = useState(initialUndistributedAmount);
+  const [availableAmount, setAvailableAmount] = useState(
+    initialUndistributedAmount
+  );
 
   const [distribution, setDistribution] = useState<CategoryDistribution>({
     give: 0,
@@ -134,19 +136,27 @@ export function DistributeFundsModal({
           {/* Available Amount */}
           <div className="rounded-lg bg-blue-50 p-4 text-center">
             <p className="text-sm text-blue-600">Available to Distribute</p>
-            <div className="flex items-center justify-center space-x-2 mt-2">
+            <div className="mt-2 flex items-center justify-center space-x-2">
               <span className="text-2xl font-bold text-blue-800">$</span>
               <input
                 type="number"
                 value={availableAmount.toFixed(2)}
-                onChange={(e) => setAvailableAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-32 text-center border border-blue-300 rounded px-2 py-1 text-2xl font-bold text-blue-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) =>
+                  setAvailableAmount(
+                    Math.max(0, parseFloat(e.target.value) || 0)
+                  )
+                }
+                className="w-32 rounded border border-blue-300 bg-white px-2 py-1 text-center text-2xl font-bold text-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 step="0.25"
                 min="0"
               />
             </div>
-            <p className="text-xs text-blue-600 mt-2">
-              Default: ${initialUndistributedAmount.toFixed(2)} ({Math.floor(initialUndistributedAmount / recipient.allowance_amount)} weeks @ ${recipient.allowance_amount}/week)
+            <p className="mt-2 text-xs text-blue-600">
+              Default: ${initialUndistributedAmount.toFixed(2)} (
+              {Math.floor(
+                initialUndistributedAmount / recipient.allowance_amount
+              )}{' '}
+              weeks @ ${recipient.allowance_amount}/week)
             </p>
           </div>
 

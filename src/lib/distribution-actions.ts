@@ -15,9 +15,11 @@ export interface DistributionData {
 
 export async function distributeAllowance(data: DistributionData) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -36,12 +38,18 @@ export async function distributeAllowance(data: DistributionData) {
   }
 
   // Validate amounts
-  const totalAmount = data.giveAmount + data.spendAmount + data.saveAmount + data.investAmount;
+  const totalAmount =
+    data.giveAmount + data.spendAmount + data.saveAmount + data.investAmount;
   if (totalAmount <= 0) {
     throw new Error('Distribution amount must be greater than zero');
   }
 
-  if (data.giveAmount < 0 || data.spendAmount < 0 || data.saveAmount < 0 || data.investAmount < 0) {
+  if (
+    data.giveAmount < 0 ||
+    data.spendAmount < 0 ||
+    data.saveAmount < 0 ||
+    data.investAmount < 0
+  ) {
     throw new Error('Individual category amounts cannot be negative');
   }
 
@@ -57,14 +65,16 @@ export async function distributeAllowance(data: DistributionData) {
       spend_amount: data.spendAmount,
       save_amount: data.saveAmount,
       invest_amount: data.investAmount,
-      notes: data.notes
+      notes: data.notes,
     })
     .select()
     .single();
 
   if (distributionError) {
     console.error('Distribution creation error:', distributionError);
-    throw new Error(`Failed to create distribution: ${distributionError.message}`);
+    throw new Error(
+      `Failed to create distribution: ${distributionError.message}`
+    );
   }
 
   // The database triggers will automatically:
@@ -80,9 +90,11 @@ export async function distributeAllowance(data: DistributionData) {
 
 export async function getRecipientDistributions(recipientId: string) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -102,11 +114,16 @@ export async function getRecipientDistributions(recipientId: string) {
   return distributions;
 }
 
-export async function getRecipientTransactions(recipientId: string, limit = 50) {
+export async function getRecipientTransactions(
+  recipientId: string,
+  limit = 50
+) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -125,13 +142,15 @@ export async function getRecipientTransactions(recipientId: string, limit = 50) 
 
   const { data: transactions, error } = await supabase
     .from('transactions')
-    .select(`
+    .select(
+      `
       *,
       distributions (
         distribution_date,
         notes
       )
-    `)
+    `
+    )
     .eq('recipient_id', recipientId)
     .order('transaction_date', { ascending: false })
     .order('created_at', { ascending: false })
@@ -148,9 +167,11 @@ export async function getRecipientTransactions(recipientId: string, limit = 50) 
 // Helper function to calculate undistributed allowance
 export async function calculateUndistributedAllowance(recipientId: string) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -179,24 +200,30 @@ export async function calculateUndistributedAllowance(recipientId: string) {
     throw new Error('Failed to calculate undistributed amount');
   }
 
-  const totalDistributed = distributionsSum?.reduce((sum, d) => sum + Number(d.total_amount), 0) || 0;
+  const totalDistributed =
+    distributionsSum?.reduce((sum, d) => sum + Number(d.total_amount), 0) || 0;
 
   // Calculate weeks since recipient was created (simplified calculation)
   const createdDate = new Date(recipient.created_at);
   const currentDate = new Date();
-  const weeksSinceCreated = Math.floor((currentDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 7));
-  
+  const weeksSinceCreated = Math.floor(
+    (currentDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 7)
+  );
+
   // Total allowance that should have been distributed
   const totalAllowanceOwed = weeksSinceCreated * recipient.allowance_amount;
-  
+
   // Undistributed amount
-  const undistributedAmount = Math.max(0, totalAllowanceOwed - totalDistributed);
+  const undistributedAmount = Math.max(
+    0,
+    totalAllowanceOwed - totalDistributed
+  );
 
   return {
     undistributedAmount,
     totalDistributed,
     totalAllowanceOwed,
     weeksSinceCreated,
-    weeklyAllowance: recipient.allowance_amount
+    weeklyAllowance: recipient.allowance_amount,
   };
 }

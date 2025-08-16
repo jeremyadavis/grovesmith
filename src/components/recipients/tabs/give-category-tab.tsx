@@ -1,13 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Plus } from 'lucide-react';
 import { CharitableCauseCard } from '../charitable-cause-card';
 import { AddCauseModal } from '../add-cause-modal';
 import { GiveBalanceSummary } from '../give-balance-summary';
-import { getCharitableCauses, CharitableCause, getGiveCategoryBalance } from '@/lib/charitable-causes-actions';
+import {
+  getCharitableCauses,
+  CharitableCause,
+  getGiveCategoryBalance,
+} from '@/lib/charitable-causes-actions';
 
 interface Recipient {
   id: string;
@@ -30,6 +40,9 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingCause, setEditingCause] = useState<CharitableCause | null>(
+    null
+  );
   const [unallocatedBalance, setUnallocatedBalance] = useState(0);
 
   const fetchCauses = async () => {
@@ -38,7 +51,7 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
       setError(null);
       const [fetchedCauses, balanceInfo] = await Promise.all([
         getCharitableCauses(recipient.id),
-        getGiveCategoryBalance(recipient.id)
+        getGiveCategoryBalance(recipient.id),
       ]);
       setCauses(fetchedCauses);
       setUnallocatedBalance(balanceInfo.unallocated);
@@ -54,14 +67,27 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
     fetchCauses();
   }, [recipient.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const activeCauses = causes.filter(cause => !cause.is_completed);
-  const completedCauses = causes.filter(cause => cause.is_completed);
+  const activeCauses = causes.filter((cause) => !cause.is_completed);
+  const completedCauses = causes.filter((cause) => cause.is_completed);
   const canAddMore = activeCauses.length < 3;
+
+  const handleEditCause = (cause: CharitableCause) => {
+    setEditingCause(cause);
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+    setEditingCause(null);
+  };
 
   return (
     <div className="space-y-6">
       {/* Give Balance Summary */}
-      <GiveBalanceSummary recipientId={recipient.id} recipientName={recipient.name} />
+      <GiveBalanceSummary
+        recipientId={recipient.id}
+        recipientName={recipient.name}
+      />
 
       {/* Charitable Causes */}
       <Card>
@@ -74,12 +100,12 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
               </CardDescription>
             </div>
             {canAddMore && (
-              <Button 
+              <Button
                 onClick={() => setIsAddModalOpen(true)}
                 size="sm"
                 className="bg-green-600 hover:bg-green-700"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Add Cause
               </Button>
             )}
@@ -87,16 +113,16 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="py-8 text-center text-gray-500">
               <p>Loading causes...</p>
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-red-500">
+            <div className="py-8 text-center text-red-500">
               <p>Error: {error}</p>
-              <Button 
-                onClick={fetchCauses} 
-                variant="outline" 
-                size="sm" 
+              <Button
+                onClick={fetchCauses}
+                variant="outline"
+                size="sm"
                 className="mt-2"
               >
                 Try Again
@@ -114,6 +140,7 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
                       availableBalance={recipient.categories.give}
                       unallocatedBalance={unallocatedBalance}
                       onUpdate={fetchCauses}
+                      onEdit={handleEditCause}
                     />
                   ))}
                 </div>
@@ -122,7 +149,9 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
               {/* Completed Causes */}
               {completedCauses.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Recently Completed</h4>
+                  <h4 className="mb-3 font-medium text-gray-700">
+                    Recently Completed
+                  </h4>
                   <div className="space-y-4">
                     {completedCauses.slice(0, 3).map((cause) => (
                       <CharitableCauseCard
@@ -131,6 +160,7 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
                         availableBalance={recipient.categories.give}
                         unallocatedBalance={unallocatedBalance}
                         onUpdate={fetchCauses}
+                        onEdit={handleEditCause}
                       />
                     ))}
                   </div>
@@ -139,18 +169,20 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
 
               {/* Empty State */}
               {activeCauses.length === 0 && completedCauses.length === 0 && (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Heart className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <h3 className="font-medium text-gray-900 mb-1">No causes added yet</h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+                  <Heart className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                  <h3 className="mb-1 font-medium text-gray-900">
+                    No causes added yet
+                  </h3>
+                  <p className="mb-4 text-sm text-gray-500">
                     Help {recipient.name} find meaningful causes to support
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => setIsAddModalOpen(true)}
-                    variant="outline" 
+                    variant="outline"
                     size="sm"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Add First Cause
                   </Button>
                 </div>
@@ -158,8 +190,10 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
 
               {/* Limit Message */}
               {!canAddMore && activeCauses.length >= 3 && (
-                <div className="text-center py-4 text-gray-500 text-sm">
-                  <p>Maximum of 3 active causes. Complete one to add another.</p>
+                <div className="py-4 text-center text-sm text-gray-500">
+                  <p>
+                    Maximum of 3 active causes. Complete one to add another.
+                  </p>
                 </div>
               )}
             </div>
@@ -171,8 +205,12 @@ export function GiveCategoryTab({ recipient }: GiveCategoryTabProps) {
       <AddCauseModal
         recipientId={recipient.id}
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSuccess={fetchCauses}
+        onClose={handleCloseModal}
+        onSuccess={() => {
+          fetchCauses();
+          handleCloseModal();
+        }}
+        editingCause={editingCause}
       />
     </div>
   );

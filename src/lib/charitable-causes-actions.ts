@@ -25,16 +25,32 @@ export interface CreateCauseData {
   dueDate?: string;
 }
 
+export interface UpdateCauseData {
+  causeId: string;
+  name: string;
+  description?: string;
+  goalAmount: number;
+  dueDate?: string;
+}
+
 export interface CompleteDonationData {
   causeId: string;
   donationAmount: number;
 }
 
-export async function getCharitableCauses(recipientId: string): Promise<CharitableCause[]> {
+export interface MarkCompleteData {
+  causeId: string;
+}
+
+export async function getCharitableCauses(
+  recipientId: string
+): Promise<CharitableCause[]> {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -67,9 +83,11 @@ export async function getCharitableCauses(recipientId: string): Promise<Charitab
 
 export async function createCharitableCause(data: CreateCauseData) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -109,7 +127,7 @@ export async function createCharitableCause(data: CreateCauseData) {
       name: data.name,
       description: data.description || null,
       goal_amount: data.goalAmount,
-      due_date: data.dueDate || null
+      due_date: data.dueDate || null,
     })
     .select()
     .single();
@@ -125,11 +143,13 @@ export async function createCharitableCause(data: CreateCauseData) {
   return newCause;
 }
 
-export async function completeDonation(data: CompleteDonationData) {
+export async function updateCharitableCause(data: UpdateCauseData) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -137,7 +157,75 @@ export async function completeDonation(data: CompleteDonationData) {
   // Get the cause and verify access
   const { data: cause, error: causeError } = await supabase
     .from('charitable_causes')
-    .select(`
+    .select(
+      `
+      *,
+      recipients!inner (
+        id,
+        manager_id
+      )
+    `
+    )
+    .eq('id', data.causeId)
+    .eq('recipients.manager_id', user.id)
+    .single();
+
+  if (causeError || !cause) {
+    throw new Error('Charitable cause not found or access denied');
+  }
+
+  if (cause.is_completed) {
+    throw new Error('Cannot edit a completed cause');
+  }
+
+  // Check if the new goal amount is less than current allocated amount
+  if (data.goalAmount < cause.current_amount) {
+    throw new Error(
+      `Goal amount cannot be less than currently allocated amount ($${cause.current_amount.toFixed(2)})`
+    );
+  }
+
+  // Update the cause
+  const { data: updatedCause, error } = await supabase
+    .from('charitable_causes')
+    .update({
+      name: data.name,
+      description: data.description || null,
+      goal_amount: data.goalAmount,
+      due_date: data.dueDate || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', data.causeId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating charitable cause:', error);
+    throw new Error(`Failed to update charitable cause: ${error.message}`);
+  }
+
+  // Revalidate the recipient page
+  revalidatePath(`/recipients/${cause.recipient_id}`);
+
+  return updatedCause;
+}
+
+export async function completeDonation(data: CompleteDonationData) {
+  const supabase = await createClient();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  // Get the cause and verify access
+  const { data: cause, error: causeError } = await supabase
+    .from('charitable_causes')
+    .select(
+      `
       *,
       recipients!inner (
         id,
@@ -147,7 +235,8 @@ export async function completeDonation(data: CompleteDonationData) {
           balance
         )
       )
-    `)
+    `
+    )
     .eq('id', data.causeId)
     .eq('recipients.manager_id', user.id)
     .single();
@@ -162,7 +251,8 @@ export async function completeDonation(data: CompleteDonationData) {
 
   // Get the Give category balance
   const giveCategory = cause.recipients.allowance_categories.find(
-    (cat: { category_type: string; balance: number }) => cat.category_type === 'give'
+    (cat: { category_type: string; balance: number }) =>
+      cat.category_type === 'give'
   );
 
   if (!giveCategory || giveCategory.balance < data.donationAmount) {
@@ -170,12 +260,15 @@ export async function completeDonation(data: CompleteDonationData) {
   }
 
   // Start a transaction to update both the cause and create a withdrawal transaction
-  const { error: updateError } = await supabase.rpc('complete_charitable_donation', {
-    p_cause_id: data.causeId,
-    p_recipient_id: cause.recipient_id,
-    p_donation_amount: data.donationAmount,
-    p_cause_name: cause.name
-  });
+  const { error: updateError } = await supabase.rpc(
+    'complete_charitable_donation',
+    {
+      p_cause_id: data.causeId,
+      p_recipient_id: cause.recipient_id,
+      p_donation_amount: data.donationAmount,
+      p_cause_name: cause.name,
+    }
+  );
 
   if (updateError) {
     console.error('Error completing donation:', updateError);
@@ -190,9 +283,11 @@ export async function completeDonation(data: CompleteDonationData) {
 
 export async function deleteCharitableCause(causeId: string) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -200,13 +295,15 @@ export async function deleteCharitableCause(causeId: string) {
   // Get the cause and verify access
   const { data: cause, error: causeError } = await supabase
     .from('charitable_causes')
-    .select(`
-      id,
-      recipient_id,
+    .select(
+      `
+      *,
       recipients!inner (
+        id,
         manager_id
       )
-    `)
+    `
+    )
     .eq('id', causeId)
     .eq('recipients.manager_id', user.id)
     .single();
@@ -215,7 +312,11 @@ export async function deleteCharitableCause(causeId: string) {
     throw new Error('Charitable cause not found or access denied');
   }
 
-  // Delete the cause
+  if (cause.is_completed) {
+    throw new Error('Cannot delete a completed cause');
+  }
+
+  // Delete the cause (allocated funds automatically become available again)
   const { error } = await supabase
     .from('charitable_causes')
     .delete()
@@ -229,14 +330,97 @@ export async function deleteCharitableCause(causeId: string) {
   // Revalidate the recipient page
   revalidatePath(`/recipients/${cause.recipient_id}`);
 
-  return { success: true };
+  return {
+    success: true,
+    returnedAmount: cause.current_amount,
+  };
+}
+
+export async function markCauseComplete(data: MarkCompleteData) {
+  const supabase = await createClient();
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  // Get the cause and verify access
+  const { data: cause, error: causeError } = await supabase
+    .from('charitable_causes')
+    .select(
+      `
+      *,
+      recipients!inner (
+        id,
+        manager_id,
+        allowance_categories (
+          category_type,
+          balance
+        )
+      )
+    `
+    )
+    .eq('id', data.causeId)
+    .eq('recipients.manager_id', user.id)
+    .single();
+
+  if (causeError || !cause) {
+    throw new Error('Charitable cause not found or access denied');
+  }
+
+  if (cause.is_completed) {
+    throw new Error('This cause is already completed');
+  }
+
+  if (cause.current_amount <= 0) {
+    throw new Error('Cannot complete a cause with no allocated funds');
+  }
+
+  // Get the Give category balance
+  const giveCategory = cause.recipients.allowance_categories.find(
+    (cat: { category_type: string; balance: number }) =>
+      cat.category_type === 'give'
+  );
+
+  if (!giveCategory || giveCategory.balance < cause.current_amount) {
+    throw new Error('Insufficient funds in Give category');
+  }
+
+  // Complete the cause by donating all allocated funds
+  const { error: completeError } = await supabase.rpc(
+    'complete_charitable_donation',
+    {
+      p_cause_id: data.causeId,
+      p_recipient_id: cause.recipient_id,
+      p_donation_amount: cause.current_amount,
+      p_cause_name: cause.name,
+    }
+  );
+
+  if (completeError) {
+    console.error('Error marking cause complete:', completeError);
+    throw new Error(`Failed to mark cause complete: ${completeError.message}`);
+  }
+
+  // Revalidate the recipient page
+  revalidatePath(`/recipients/${cause.recipient_id}`);
+
+  return {
+    success: true,
+    donatedAmount: cause.current_amount,
+  };
 }
 
 export async function getGiveCategoryBalance(recipientId: string) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -276,22 +460,28 @@ export async function getGiveCategoryBalance(recipientId: string) {
     throw new Error('Failed to fetch active causes');
   }
 
-  const totalAllocated = activeCauses?.reduce((sum, cause) => sum + Number(cause.current_amount), 0) || 0;
+  const totalAllocated =
+    activeCauses?.reduce(
+      (sum, cause) => sum + Number(cause.current_amount),
+      0
+    ) || 0;
   const totalUnspent = Number(giveCategory.balance);
   const unallocated = totalUnspent - totalAllocated;
 
   return {
     totalUnspent,
-    totalAllocated, 
-    unallocated
+    totalAllocated,
+    unallocated,
   };
 }
 
 export async function allocateToCharity(causeId: string, amount: number) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -299,13 +489,15 @@ export async function allocateToCharity(causeId: string, amount: number) {
   // Get the cause and verify access
   const { data: cause, error: causeError } = await supabase
     .from('charitable_causes')
-    .select(`
+    .select(
+      `
       *,
       recipients!inner (
         id,
         manager_id
       )
-    `)
+    `
+    )
     .eq('id', causeId)
     .eq('recipients.manager_id', user.id)
     .single();
@@ -330,7 +522,7 @@ export async function allocateToCharity(causeId: string, amount: number) {
     .from('charitable_causes')
     .update({
       current_amount: cause.current_amount + amount,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq('id', causeId);
 

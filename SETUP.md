@@ -15,6 +15,7 @@ After cloning this repository, follow these steps to get Grovesmith running:
 
 1. Copy your Supabase project URL and anon key
 2. Update `.env.local` with your credentials:
+
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_project_url_here
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
@@ -34,6 +35,7 @@ Visit `http://localhost:3000` and create your first manager account!
 This commit represents the completion of **Phase 3: Authentication & Recipient Management**
 
 ### What's Working
+
 - ✅ Complete authentication flow with server-side rendering
 - ✅ Manager dashboard showing all recipients
 - ✅ Add recipients with custom allowance amounts
@@ -42,6 +44,7 @@ This commit represents the completion of **Phase 3: Authentication & Recipient M
 - ✅ Database with proper security policies
 
 ### What's Next
+
 - 🔄 **Phase 4:** Allowance distribution interface
 - 🔄 **Phase 5:** Category-specific features and management
 

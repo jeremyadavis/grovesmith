@@ -49,9 +49,11 @@ export async function signOut() {
 
 export async function addRecipient(formData: FormData) {
   const supabase = await createClient();
-  
+
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('Not authenticated');
   }
@@ -67,13 +69,11 @@ export async function addRecipient(formData: FormData) {
     throw new Error('Valid allowance amount is required');
   }
 
-  const { error } = await supabase
-    .from('recipients')
-    .insert({
-      name: name.trim(),
-      allowance_amount: allowanceAmount,
-      manager_id: user.id,
-    });
+  const { error } = await supabase.from('recipients').insert({
+    name: name.trim(),
+    allowance_amount: allowanceAmount,
+    manager_id: user.id,
+  });
 
   if (error) {
     throw new Error(error.message);

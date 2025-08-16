@@ -32,13 +32,13 @@ export function AppHeader({ managerName, managerEmail }: AppHeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="border-b border-gray-200 bg-white shadow-sm">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* App branding */}
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">G</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-blue-600">
+              <span className="text-lg font-bold text-white">G</span>
             </div>
             <span className="text-xl font-bold text-gray-900">Grovesmith</span>
           </div>
@@ -46,14 +46,19 @@ export function AppHeader({ managerName, managerEmail }: AppHeaderProps) {
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2 px-3 py-2">
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <Button
+                variant="ghost"
+                className="flex items-center space-x-2 px-3 py-2"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
                   <span className="text-sm font-medium text-gray-600">
                     {managerName.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <div className="hidden sm:block text-left">
-                  <div className="text-sm font-medium text-gray-900">{managerName}</div>
+                <div className="hidden text-left sm:block">
+                  <div className="text-sm font-medium text-gray-900">
+                    {managerName}
+                  </div>
                   {managerEmail && (
                     <div className="text-xs text-gray-500">{managerEmail}</div>
                   )}
@@ -63,7 +68,9 @@ export function AppHeader({ managerName, managerEmail }: AppHeaderProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-2 py-1.5">
-                <div className="text-sm font-medium text-gray-900">{managerName}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {managerName}
+                </div>
                 {managerEmail && (
                   <div className="text-xs text-gray-500">{managerEmail}</div>
                 )}
@@ -78,7 +85,7 @@ export function AppHeader({ managerName, managerEmail }: AppHeaderProps) {
                 Manager Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="cursor-pointer text-red-600 focus:text-red-600"
                 onClick={handleSignOut}
                 disabled={isLoading}

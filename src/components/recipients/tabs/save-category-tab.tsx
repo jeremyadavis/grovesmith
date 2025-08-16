@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PiggyBank, Plus, Target, List } from 'lucide-react';
 
@@ -41,7 +47,7 @@ export function SaveCategoryTab({ recipient }: SaveCategoryTabProps) {
               <p className="text-sm text-gray-600">Total savings</p>
             </div>
             <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Money
             </Button>
           </div>
@@ -62,14 +68,17 @@ export function SaveCategoryTab({ recipient }: SaveCategoryTabProps) {
         <CardContent>
           <div className="space-y-4">
             {/* Placeholder for subcategories */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Target className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <h3 className="font-medium text-gray-900 mb-1">No categories yet</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Create categories to organize {recipient.name}&apos;s savings goals
+            <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+              <Target className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+              <h3 className="mb-1 font-medium text-gray-900">
+                No categories yet
+              </h3>
+              <p className="mb-4 text-sm text-gray-500">
+                Create categories to organize {recipient.name}&apos;s savings
+                goals
               </p>
               <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Add Category
               </Button>
             </div>
@@ -91,21 +100,22 @@ export function SaveCategoryTab({ recipient }: SaveCategoryTabProps) {
         <CardContent>
           <div className="space-y-4">
             {/* Placeholder for wishlist items */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <List className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <h3 className="font-medium text-gray-900 mb-1">Wishlist is empty</h3>
-              <p className="text-sm text-gray-500 mb-4">
+            <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+              <List className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+              <h3 className="mb-1 font-medium text-gray-900">
+                Wishlist is empty
+              </h3>
+              <p className="mb-4 text-sm text-gray-500">
                 Add items {recipient.name} wants to save for
               </p>
               <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Add Wishlist Item
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
-
 
       {/* Savings Tips */}
       <Card>
@@ -115,19 +125,20 @@ export function SaveCategoryTab({ recipient }: SaveCategoryTabProps) {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-purple-500"></div>
               <p className="text-sm text-gray-700">
                 Set clear goals for what you want to buy
               </p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-purple-500"></div>
               <p className="text-sm text-gray-700">
-                Sometimes waiting helps you realize you don&apos;t want something as much
+                Sometimes waiting helps you realize you don&apos;t want
+                something as much
               </p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+              <div className="mt-2 h-2 w-2 rounded-full bg-purple-500"></div>
               <p className="text-sm text-gray-700">
                 Celebrate when you reach your savings goals!
               </p>

@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { DollarSign, Heart, PiggyBank } from 'lucide-react';
 import { getGiveCategoryBalance } from '@/lib/charitable-causes-actions';
 
@@ -10,11 +16,14 @@ interface GiveBalanceSummaryProps {
   recipientName: string;
 }
 
-export function GiveBalanceSummary({ recipientId, recipientName }: GiveBalanceSummaryProps) {
+export function GiveBalanceSummary({
+  recipientId,
+  recipientName,
+}: GiveBalanceSummaryProps) {
   const [balanceInfo, setBalanceInfo] = useState({
     totalUnspent: 0,
     totalAllocated: 0,
-    unallocated: 0
+    unallocated: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +50,7 @@ export function GiveBalanceSummary({ recipientId, recipientName }: GiveBalanceSu
     return (
       <Card className="border-green-200 bg-green-50">
         <CardContent className="pt-6">
-          <div className="text-center py-4 text-gray-500">
+          <div className="py-4 text-center text-gray-500">
             <p>Loading balance...</p>
           </div>
         </CardContent>
@@ -53,7 +62,7 @@ export function GiveBalanceSummary({ recipientId, recipientName }: GiveBalanceSu
     return (
       <Card className="border-red-200 bg-red-50">
         <CardContent className="pt-6">
-          <div className="text-center py-4 text-red-500">
+          <div className="py-4 text-center text-red-500">
             <p>Error: {error}</p>
           </div>
         </CardContent>
@@ -70,56 +79,58 @@ export function GiveBalanceSummary({ recipientId, recipientName }: GiveBalanceSu
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Total Unspent */}
-          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-            <DollarSign className="h-8 w-8 text-green-600 mx-auto mb-2" />
+          <div className="rounded-lg bg-white p-4 text-center shadow-sm">
+            <DollarSign className="mx-auto mb-2 h-8 w-8 text-green-600" />
             <div className="text-2xl font-bold text-green-700">
               ${balanceInfo.totalUnspent.toFixed(2)}
             </div>
             <div className="text-sm text-gray-600">Total Give Money</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               All unspent give funds
             </div>
           </div>
 
           {/* Allocated to Causes */}
-          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-            <Heart className="h-8 w-8 text-pink-600 mx-auto mb-2" />
+          <div className="rounded-lg bg-white p-4 text-center shadow-sm">
+            <Heart className="mx-auto mb-2 h-8 w-8 text-pink-600" />
             <div className="text-2xl font-bold text-pink-700">
               ${balanceInfo.totalAllocated.toFixed(2)}
             </div>
             <div className="text-sm text-gray-600">Allocated to Causes</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               Money saved for specific causes
             </div>
           </div>
 
           {/* Available to Allocate */}
-          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-            <PiggyBank className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+          <div className="rounded-lg bg-white p-4 text-center shadow-sm">
+            <PiggyBank className="mx-auto mb-2 h-8 w-8 text-blue-600" />
             <div className="text-2xl font-bold text-blue-700">
               ${balanceInfo.unallocated.toFixed(2)}
             </div>
             <div className="text-sm text-gray-600">Available to Allocate</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               Unassigned give money
             </div>
           </div>
         </div>
 
         {balanceInfo.unallocated > 0 && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
             <p className="text-sm text-blue-700">
-              💡 You have ${balanceInfo.unallocated.toFixed(2)} available to allocate to charitable causes
+              💡 You have ${balanceInfo.unallocated.toFixed(2)} available to
+              allocate to charitable causes
             </p>
           </div>
         )}
 
         {balanceInfo.totalAllocated > 0 && (
-          <div className="mt-2 p-3 bg-pink-50 rounded-lg border border-pink-200">
+          <div className="mt-2 rounded-lg border border-pink-200 bg-pink-50 p-3">
             <p className="text-sm text-pink-700">
-              ❤️ ${balanceInfo.totalAllocated.toFixed(2)} is currently allocated to active causes
+              ❤️ ${balanceInfo.totalAllocated.toFixed(2)} is currently allocated
+              to active causes
             </p>
           </div>
         )}

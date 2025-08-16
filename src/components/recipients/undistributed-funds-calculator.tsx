@@ -13,33 +13,41 @@ interface UndistributedFundsProps {
   }) => React.ReactNode;
 }
 
-export function UndistributedFundsCalculator({ recipientId, children }: UndistributedFundsProps) {
+export function UndistributedFundsCalculator({
+  recipientId,
+  children,
+}: UndistributedFundsProps) {
   const [data, setData] = useState({
     undistributedAmount: 0,
     weeksPending: 0,
     isLoading: true,
-    error: null as string | null
+    error: null as string | null,
   });
 
   useEffect(() => {
     async function fetchUndistributedAmount() {
       try {
-        setData(prev => ({ ...prev, isLoading: true, error: null }));
-        
+        setData((prev) => ({ ...prev, isLoading: true, error: null }));
+
         const result = await calculateUndistributedAllowance(recipientId);
-        
+
         setData({
           undistributedAmount: result.undistributedAmount,
-          weeksPending: Math.floor(result.undistributedAmount / result.weeklyAllowance),
+          weeksPending: Math.floor(
+            result.undistributedAmount / result.weeklyAllowance
+          ),
           isLoading: false,
-          error: null
+          error: null,
         });
       } catch (error) {
         console.error('Error calculating undistributed funds:', error);
-        setData(prev => ({
+        setData((prev) => ({
           ...prev,
           isLoading: false,
-          error: error instanceof Error ? error.message : 'Failed to calculate undistributed funds'
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Failed to calculate undistributed funds',
         }));
       }
     }

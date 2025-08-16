@@ -18,7 +18,7 @@ export const AVAILABLE_THEMES: ProfileTheme[] = [
     gradient: 'from-pink-200 to-purple-200',
     avatarBg: 'bg-white/20',
     textColor: 'text-gray-800',
-    unlocked: true // Default theme
+    unlocked: true, // Default theme
   },
   {
     id: 'ocean',
@@ -82,7 +82,7 @@ export const AVAILABLE_THEMES: ProfileTheme[] = [
     gradient: 'from-cyan-200 via-purple-200 to-pink-200',
     avatarBg: 'bg-white/20',
     textColor: 'text-gray-800',
-  }
+  },
 ];
 
 // Generate a deterministic theme for a recipient based on their ID
@@ -91,10 +91,10 @@ export function getRecipientTheme(recipientId: string): ProfileTheme {
   let hash = 0;
   for (let i = 0; i < recipientId.length; i++) {
     const char = recipientId.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
-  
+
   // Use the hash to select a theme (ensure it's always positive)
   const themeIndex = Math.abs(hash) % AVAILABLE_THEMES.length;
   return AVAILABLE_THEMES[themeIndex];
@@ -102,20 +102,26 @@ export function getRecipientTheme(recipientId: string): ProfileTheme {
 
 // Get theme by ID (for when recipients can choose their own themes)
 export function getThemeById(themeId: string): ProfileTheme | undefined {
-  return AVAILABLE_THEMES.find(theme => theme.id === themeId);
+  return AVAILABLE_THEMES.find((theme) => theme.id === themeId);
 }
 
 // Check if a recipient has unlocked a specific theme (placeholder for future logic)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function hasUnlockedTheme(_recipientId: string, _themeId: string): boolean {
+export function hasUnlockedTheme(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _recipientId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _themeId: string
+): boolean {
   // For now, everyone has access to all themes
   // Future implementation would check database for unlocked themes
   return true;
 }
 
 // Get all unlocked themes for a recipient (placeholder for future logic)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getUnlockedThemes(_recipientId: string): ProfileTheme[] {
+export function getUnlockedThemes(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _recipientId: string
+): ProfileTheme[] {
   // For now, return first 3 themes as "unlocked"
   // Future implementation would fetch from database
   return AVAILABLE_THEMES.slice(0, 3);

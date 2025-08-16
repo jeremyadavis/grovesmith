@@ -17,9 +17,11 @@ Managers (1) ──── (Many) Recipients
 ## Core Entities
 
 ### Manager Entity
+
 Represents parents, guardians, or sponsors who control financial operations.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key, links to Supabase auth system
 - `email` - Unique email address from authentication
 - `full_name` - Display name for the manager
@@ -27,20 +29,24 @@ Represents parents, guardians, or sponsors who control financial operations.
 - `updated_at` - Profile modification timestamp
 
 **Business Rules:**
+
 - Each manager operates as an isolated tenant
 - Complete data separation between different manager accounts
 - Managers can only access their own recipients and related data
 - Profile extends Supabase's built-in authentication system
 
 **Data Security:**
+
 - Row-Level Security (RLS) ensures managers can only see their own data
 - Cascade delete removes all related data when manager account is deleted
 - Email uniqueness enforced at authentication layer
 
 ### Recipient Entity
+
 Represents children or learners participating in financial education.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for recipient identification
 - `manager_id` - Foreign key linking to manager (owner)
 - `name` - Display name for the recipient
@@ -52,20 +58,24 @@ Represents children or learners participating in financial education.
 - `updated_at` - Profile modification timestamp
 
 **Business Rules:**
+
 - Each recipient belongs to exactly one manager
 - Custom allowance amounts per recipient (manager-controlled)
 - Soft delete through `is_active` flag to preserve transaction history
 - Archive capability through `is_archived` for graduated recipients
 
 **Personalization Features:**
+
 - **Theme Assignment:** Each recipient gets a unique visual theme based on deterministic algorithm
 - **Avatar Support:** Custom profile images for personal connection
 - **Individual Settings:** Per-recipient allowance amounts and preferences
 
 ### Allowance Categories Entity
+
 The four core financial education categories for each recipient.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for category identification
 - `recipient_id` - Foreign key linking to recipient
 - `category_type` - Enum: 'give', 'spend', 'save', 'invest'
@@ -74,6 +84,7 @@ The four core financial education categories for each recipient.
 - `updated_at` - Last balance update timestamp
 
 **Business Rules:**
+
 - Exactly four categories per recipient (enforced by unique constraint)
 - Categories automatically created when recipient is added
 - Balances updated through distribution system and category-specific actions
@@ -84,6 +95,7 @@ The four core financial education categories for each recipient.
   - **Invest:** Principal amount for dividend calculation
 
 **Category-Specific Behaviors:**
+
 - **Give Category:** Balance represents total unspent money; separate tracking of allocated vs unallocated funds
 - **Spend Category:** Balance represents cumulative contributions for reflection, not remaining amount
 - **Save Category:** Balance available for allocation to wishlist items and subcategories
@@ -92,12 +104,14 @@ The four core financial education categories for each recipient.
 ## Data Relationships
 
 ### Manager → Recipient Relationship
+
 - **Type:** One-to-Many
 - **Constraint:** Recipients must belong to exactly one manager
 - **Security:** Row-Level Security ensures complete data isolation
 - **Lifecycle:** Cascade delete removes recipients when manager account is deleted
 
-### Recipient → Categories Relationship  
+### Recipient → Categories Relationship
+
 - **Type:** One-to-Four (exactly four categories)
 - **Constraint:** Unique constraint prevents duplicate categories per recipient
 - **Automation:** Database trigger automatically creates all four categories for new recipients
@@ -106,12 +120,13 @@ The four core financial education categories for each recipient.
 ## Data Integrity & Security
 
 ### Row-Level Security Policies
+
 ```sql
 -- Managers can only access their own profile
 CREATE POLICY "managers_own_data" ON managers
   FOR ALL USING (auth.uid() = id);
 
--- Managers can only access their own recipients  
+-- Managers can only access their own recipients
 CREATE POLICY "recipients_own_data" ON recipients
   FOR ALL USING (manager_id = auth.uid());
 
@@ -119,14 +134,15 @@ CREATE POLICY "recipients_own_data" ON recipients
 CREATE POLICY "categories_through_recipients" ON allowance_categories
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM recipients r 
-      WHERE r.id = allowance_categories.recipient_id 
+      SELECT 1 FROM recipients r
+      WHERE r.id = allowance_categories.recipient_id
       AND r.manager_id = auth.uid()
     )
   );
 ```
 
 ### Database Triggers
+
 ```sql
 -- Automatically create four categories when recipient is added
 CREATE TRIGGER create_recipient_categories_trigger
@@ -135,6 +151,7 @@ CREATE TRIGGER create_recipient_categories_trigger
 ```
 
 ### Data Validation
+
 - **Manager Email:** Must be unique and valid email format
 - **Recipient Name:** Required, non-empty string
 - **Allowance Amount:** Positive decimal with reasonable limits
@@ -144,6 +161,7 @@ CREATE TRIGGER create_recipient_categories_trigger
 ## Performance Considerations
 
 ### Database Indexing
+
 ```sql
 -- Core relationship indexes
 CREATE INDEX idx_recipients_manager_id ON recipients(manager_id);
@@ -156,6 +174,7 @@ CREATE INDEX idx_recipients_archived ON recipients(is_archived) WHERE is_archive
 ```
 
 ### Query Patterns
+
 - **Manager Dashboard:** Efficient retrieval of all recipients with category summaries
 - **Recipient Profiles:** Fast loading of individual recipient data with all categories
 - **Balance Calculations:** Optimized queries for real-time financial calculations
@@ -164,16 +183,19 @@ CREATE INDEX idx_recipients_archived ON recipients(is_archived) WHERE is_archive
 ## Integration Points
 
 ### Authentication System
+
 - **Supabase Integration:** Direct foreign key relationship to auth.users table
 - **Session Management:** Row-Level Security automatically filters data based on authenticated user
 - **OAuth Support:** Works with Google, GitHub, and other OAuth providers through Supabase
 
 ### Theme System
+
 - **Deterministic Assignment:** Each recipient gets consistent theme based on ID hash
 - **Visual Consistency:** Same theme appears across all app views and sessions
 - **Family Distinction:** Multiple recipients have clearly different visual identities
 
 ### Category Extensions
+
 - **Give Categories:** Foundation for charitable causes and fund allocation
 - **Save Categories:** Base for subcategories and wishlist management
 - **Invest Categories:** Framework for dividend calculations and milestone tracking
@@ -182,16 +204,19 @@ CREATE INDEX idx_recipients_archived ON recipients(is_archived) WHERE is_archive
 ## Future Extensions
 
 ### Enhanced Personalization
+
 - **Custom Themes:** Unlock additional themes through achievements
 - **Avatar Systems:** Expanded profile customization options
 - **Preference Storage:** Per-recipient settings and learning preferences
 
 ### Advanced Analytics
+
 - **Progress Tracking:** Long-term financial education progression metrics
 - **Family Insights:** Aggregate analytics across multiple recipients
 - **Educational Outcomes:** Correlation between system usage and financial literacy development
 
 ### Scalability Features
+
 - **Multi-Family Support:** Enhanced tenant isolation for larger deployments
 - **Bulk Operations:** Efficient operations across multiple recipients
 - **Data Export:** Complete data portability for families

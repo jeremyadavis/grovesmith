@@ -27,19 +27,19 @@ export function CategoryTabs({ recipient }: CategoryTabsProps) {
     <Tabs defaultValue="give" className="w-full">
       <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="give" className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <div className="h-3 w-3 rounded-full bg-green-500"></div>
           <span>Give</span>
         </TabsTrigger>
         <TabsTrigger value="spend" className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <div className="h-3 w-3 rounded-full bg-blue-500"></div>
           <span>Spend</span>
         </TabsTrigger>
         <TabsTrigger value="save" className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+          <div className="h-3 w-3 rounded-full bg-purple-500"></div>
           <span>Save</span>
         </TabsTrigger>
         <TabsTrigger value="invest" className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+          <div className="h-3 w-3 rounded-full bg-orange-500"></div>
           <span>Invest</span>
         </TabsTrigger>
       </TabsList>

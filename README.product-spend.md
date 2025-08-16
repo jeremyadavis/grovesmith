@@ -7,13 +7,15 @@ The Spend category gives children the reward and pride of having money on their 
 ## Learning Objectives
 
 ### Primary Goals
+
 - **Transaction Confidence:** Comfort handling cash and interacting with cashiers or self-checkout
-- **Independence:** Pride and responsibility of making their own purchase decisions  
+- **Independence:** Pride and responsibility of making their own purchase decisions
 - **Natural Consequences:** Learn from impulse purchases and their outcomes
 - **Money Awareness:** Understanding the finite nature of money through depletion
 - **Self-Reflection:** Analyzing their spending patterns over time for improved decision-making
 
 ### Educational Philosophy
+
 - **Freedom to Fail:** No restrictions on purchases - mistakes are part of learning
 - **Real-World Practice:** Actual cash transactions build confidence and skills
 - **No Tracking of Specifics:** Avoid judgment on individual purchases
@@ -23,12 +25,14 @@ The Spend category gives children the reward and pride of having money on their 
 ## Key Features (= Planned Implementation)
 
 ### Untracked Spending Freedom
+
 - **Complete Autonomy:** Children can spend their Spend money on anything they choose
 - **No Purchase Tracking:** Individual items and transactions are not monitored or judged
 - **Cash-Based:** Physical money for authentic transaction experiences
 - **No Questions Asked:** Parents don't interfere with or critique spending choices
 
 ### Contribution Tracking & Reflection
+
 While specific purchases aren't tracked, the category does monitor total contributions over time:
 
 - **Total Contributions:** Track how much money has been allocated to Spend category over time
@@ -37,7 +41,9 @@ While specific purchases aren't tracked, the category does monitor total contrib
 - **Awareness Building:** Often children feel they "never have money" but seeing $100+ in yearly contributions reveals the reality
 
 ### Balance Display Philosophy
+
 The Spend category balance represents **total lifetime contributions**, not remaining cash:
+
 - **Always Growing:** Balance increases with each allowance distribution to Spend
 - **No Deductions:** Balance doesn't decrease when money is spent (since spending isn't tracked)
 - **Historical Record:** Shows cumulative investment in learning about money transactions
@@ -46,18 +52,21 @@ The Spend category balance represents **total lifetime contributions**, not rema
 ## User Interface Design (Planned)
 
 ### Category Overview
+
 - **Contribution Summary:** Clear display of total money allocated to Spend over different time periods
 - **Period Toggles:** Easy switching between monthly, annual, and all-time views
 - **Growth Visualization:** Optional charts showing contribution patterns over time
 - **Reflection Prompts:** Age-appropriate questions to encourage spending reflection
 
 ### Time Period Views
+
 - **Monthly View:** Current month's contributions, with comparison to previous months
 - **Annual View:** Year-to-date total, comparison to previous years
 - **All-Time View:** Total contributions since recipient was created
 - **Trend Analysis:** Simple indicators showing whether spending is increasing or decreasing
 
 ### Educational Messaging
+
 - **Perspective Building:** "You've received $127 this year for spending - how did you use it?"
 - **Goal Reflection:** "Would you rather have that $50 from last month available for your Save goals?"
 - **Choice Awareness:** Help children connect their spending choices to opportunity costs
@@ -65,6 +74,7 @@ The Spend category balance represents **total lifetime contributions**, not rema
 ## Implementation Philosophy
 
 ### Privacy-First Approach
+
 The Spend category deliberately avoids tracking individual purchases:
 
 - **Privacy Protection:** Children's individual purchase choices remain completely private
@@ -73,6 +83,7 @@ The Spend category deliberately avoids tracking individual purchases:
 - **Judgment-Free Environment:** No data exists to critique or analyze specific spending choices
 
 ### Reflection Without Surveillance
+
 The system provides learning opportunities without invasive tracking:
 
 - **Aggregate Awareness:** Children see total money received over time for reflection
@@ -83,6 +94,7 @@ The system provides learning opportunities without invasive tracking:
 ## Educational Workflow
 
 ### Typical Spend Category Journey
+
 1. **Allowance Distribution:** Manager allocates portion of allowance to Spend category
 2. **Cash Preparation:** Convert digital allocation to physical cash for child
 3. **Independent Spending:** Child makes autonomous purchase decisions
@@ -91,6 +103,7 @@ The system provides learning opportunities without invasive tracking:
 6. **Learning Integration:** Connect spending experiences to broader financial education
 
 ### Teaching Opportunities
+
 - **Pre-Shopping Discussions:** Talk about wants vs needs before store visits
 - **Transaction Practice:** Role-play checkout scenarios at home
 - **Mistake Processing:** Discuss regrettable purchases without judgment
@@ -100,32 +113,37 @@ The system provides learning opportunities without invasive tracking:
 ## Parent Guidance
 
 ### Recommended Approach
+
 - **Hands-Off Execution:** Don't interfere with or critique spending choices in the moment
 - **Reflective Conversations:** Use category data for thoughtful discussions about patterns
 - **Natural Learning:** Allow mistakes and disappointments to teach their own lessons
 - **Supportive Presence:** Be available for discussions when children want to talk about purchases
 
 ### Common Pitfalls to Avoid
+
 - **Micromanaging:** Tracking or questioning every purchase defeats the category's purpose
-- **Judgment:** Criticizing spending choices reduces trust and learning opportunities  
+- **Judgment:** Criticizing spending choices reduces trust and learning opportunities
 - **Rescuing:** Providing additional money when Spend category is depleted
 - **Comparison:** Using spending data to shame or compare between siblings
 
 ## Future Enhancements
 
 ### Advanced Reflection Tools
+
 - **Spending Categories:** Optional high-level categorization (food, toys, etc.) for pattern recognition
 - **Regret Tracking:** Simple way to note purchases children later regretted
 - **Goal Visualization:** Show how spending amounts could contribute to active Save or Give goals
 - **Seasonal Analysis:** Identify spending patterns around holidays or special events
 
 ### Integration Features
+
 - **Other Category Connections:** Visual comparison of Spend vs Save/Give allocation choices
 - **Achievement System:** Trophies for wise spending decisions or spending mindfulness
 - **Family Budgeting:** Connection to household spending discussions and education
 - **Real-World Skills:** Integration with financial literacy lessons about budgeting and planning
 
 ### Privacy Features
+
 - **Selective Sharing:** Children can choose what spending information to share with parents
 - **Personal Journal:** Private space for children to reflect on their spending experiences
 - **Confidence Building:** Tools that emphasize positive spending decision growth
@@ -134,12 +152,14 @@ The system provides learning opportunities without invasive tracking:
 ## Success Metrics
 
 ### Learning Indicators
+
 - **Transaction Confidence:** Child's comfort level with making purchases independently
 - **Reflection Engagement:** Participation in discussions about spending patterns
 - **Decision Evolution:** Improvement in spending satisfaction over time
 - **Opportunity Cost Awareness:** Recognition of trade-offs between spending and other goals
 
 ### Behavioral Outcomes
+
 - **Spending Velocity:** Changes in how quickly children spend their allocated money
 - **Purchase Satisfaction:** Reduced complaints about "wasting money" over time
 - **Cross-Category Awareness:** Increased consideration of Save/Give goals before spending
@@ -148,12 +168,14 @@ The system provides learning opportunities without invasive tracking:
 ## Integration with Other Categories
 
 ### Natural Connections
+
 - **Save Category:** Children may realize they'd rather save for larger goals than spend on impulse items
 - **Give Category:** Awareness that spending money could have helped charitable causes
 - **Invest Category:** Understanding that spent money can't grow through investment
 - **Distribution Decisions:** Spending experiences inform future allowance allocation choices
 
 ### Educational Synergies
+
 - **Balanced Approach:** Spend category prevents children from becoming overly restrictive with money
 - **Real-World Preparation:** Transaction skills support future financial independence
 - **Gratitude Development:** Appreciation for discretionary spending money

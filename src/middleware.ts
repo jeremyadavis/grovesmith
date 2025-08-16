@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   // Refresh session to ensure latest auth state
   const {
     data: { user },
-    error
+    error,
   } = await supabase.auth.getUser();
 
   // Skip processing for development files and static assets
@@ -42,7 +42,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Only log for actual page requests in development
-  if (process.env.NODE_ENV === 'development' && !request.nextUrl.pathname.startsWith('/_next')) {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    !request.nextUrl.pathname.startsWith('/_next')
+  ) {
     console.log('Middleware:', {
       path: request.nextUrl.pathname,
       hasUser: !!user,
@@ -51,12 +54,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // Auth redirects
-  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth/callback') && !request.nextUrl.pathname.startsWith('/debug')) {
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith('/login') &&
+    !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/debug')
+  ) {
     const redirectUrl = new URL('/login', request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && (request.nextUrl.pathname.startsWith('/login'))) {
+  if (user && request.nextUrl.pathname.startsWith('/login')) {
     const redirectUrl = new URL('/dashboard', request.url);
     return NextResponse.redirect(redirectUrl);
   }

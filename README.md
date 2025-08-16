@@ -9,21 +9,25 @@ Help children develop healthy financial habits by learning to allocate their all
 ## Key Features
 
 ✅ **Complete Allowance Management**
+
 - Pooled distribution system with flexible timing
 - Automatic balance tracking and transaction history
 - Manager-controlled with educational transparency
 
 ✅ **Give Category (Implemented)**
+
 - Up to 3 charitable causes per child
 - Fund allocation system with donation completion
 - Visual progress tracking and impact celebration
 
 ✅ **Gamification & Personalization**
+
 - 7-trophy achievement system tied to real financial milestones
 - 10 unique recipient themes for visual personalization
 - Progress recognition without artificial point systems
 
 🔄 **Coming Next: Save, Spend & Invest Categories**
+
 - Save: Wishlist management with subcategories and goal tracking
 - Spend: Privacy-focused spending reflection without surveillance
 - Invest: Dividend simulation leading to real investment accounts
@@ -40,10 +44,12 @@ Help children develop healthy financial habits by learning to allocate their all
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Supabase account
 
 ### Quick Start
+
 ```bash
 # 1. Clone and install
 git clone https://github.com/your-username/grovesmith.git
@@ -64,6 +70,7 @@ npm run dev
 Visit `http://localhost:3000` to see the application.
 
 ### Development Commands
+
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
@@ -74,6 +81,7 @@ npm run format       # Format with Prettier
 ## Project Documentation
 
 ### Product Requirements
+
 - **[Product Overview](README.product-overview.md)** - Core philosophy and educational approach
 - **[Distribution System](README.product-distribution.md)** - Allowance distribution features
 - **[Give Category](README.product-give.md)** - Charitable giving implementation ✅
@@ -83,6 +91,7 @@ npm run format       # Format with Prettier
 - **[Trophy System](README.product-trophies.md)** - Gamification and achievements ✅
 
 ### Technical Implementation
+
 - **[Core Data Models](README.data-model-core.md)** - Users, recipients, categories
 - **[Distribution Data](README.data-model-distribution.md)** - Transaction and balance systems
 - **[Category Data Models](README.data-model-give.md)** - Domain-specific data structures
@@ -92,14 +101,16 @@ npm run format       # Format with Prettier
 ## Current Status
 
 **Phase 5 Complete: Give Category Features**
+
 - ✅ Charitable causes with fund allocation
-- ✅ Three-tier balance system (total, allocated, unallocated)  
+- ✅ Three-tier balance system (total, allocated, unallocated)
 - ✅ Donation completion with transaction recording
 - ✅ Visual progress tracking and status indicators
 
 **Next Development Priority:**
+
 - Save category with wishlist management and subcategories
-- Spend category with reflection tools and contribution tracking  
+- Spend category with reflection tools and contribution tracking
 - Invest category with dividend simulation and milestone achievements
 
 ## Educational Philosophy
@@ -107,7 +118,7 @@ npm run format       # Format with Prettier
 Grovesmith emphasizes **learning through experience** rather than chore-based rewards:
 
 - **Manager-Controlled:** Parents maintain oversight while children learn through guided experience
-- **Real Consequences:** Financial decisions have actual outcomes within a safe learning environment  
+- **Real Consequences:** Financial decisions have actual outcomes within a safe learning environment
 - **Balanced Approach:** Equal emphasis on giving, spending, saving, and investing
 - **Privacy-Respectful:** No surveillance of individual purchases or personal choices
 - **Achievement-Based:** Recognition tied to genuine financial milestones and positive behaviors
@@ -118,4 +129,4 @@ This is currently a personal project focused on family financial education. The 
 
 ---
 
-*Teaching financial literacy, one allowance at a time.* 🌱💰
+_Teaching financial literacy, one allowance at a time._ 🌱💰

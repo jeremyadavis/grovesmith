@@ -31,13 +31,18 @@ export default async function RecipientPage({ params }: RecipientPageProps) {
   // Fetch current recipient with categories
   const { data: recipient, error } = await supabase
     .from('recipients')
-    .select(`
-      *,
+    .select(
+      `
+      id,
+      name,
+      allowance_amount,
+      avatar_url,
       allowance_categories (
         category_type,
         balance
       )
-    `)
+    `
+    )
     .eq('id', id)
     .eq('manager_id', user.id)
     .eq('is_active', true)
@@ -52,26 +57,29 @@ export default async function RecipientPage({ params }: RecipientPageProps) {
     give: 0,
     spend: 0,
     save: 0,
-    invest: 0
+    invest: 0,
   };
 
   if (recipient.allowance_categories) {
-    recipient.allowance_categories.forEach((cat: { category_type: string; balance: number }) => {
-      categories[cat.category_type as keyof typeof categories] = cat.balance;
-    });
+    recipient.allowance_categories.forEach(
+      (cat: { category_type: string; balance: number }) => {
+        categories[cat.category_type as keyof typeof categories] = cat.balance;
+      }
+    );
   }
 
   const recipientWithCategories = {
     ...recipient,
-    categories
+    categories,
   };
 
   // Get manager name from user metadata or email
-  const managerName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Manager';
+  const managerName =
+    user.user_metadata?.full_name || user.email?.split('@')[0] || 'Manager';
 
   return (
-    <RecipientProfileClient 
-      recipient={recipientWithCategories} 
+    <RecipientProfileClient
+      recipient={recipientWithCategories}
       allRecipients={allRecipients || []}
       managerName={managerName}
       managerEmail={user.email}

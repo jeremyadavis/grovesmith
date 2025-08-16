@@ -17,16 +17,18 @@ Recipients (1) ──── (Many) Distributions
 ## Core Entities
 
 ### Distribution Entity
+
 Master record of each allowance distribution event.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for distribution identification
 - `recipient_id` - Foreign key linking to target recipient
 - `manager_id` - Foreign key linking to authorizing manager
 - `distribution_date` - Date the distribution represents (supports backdating)
 - `total_amount` - Sum of all category allocations
 - `give_amount` - Amount allocated to Give category
-- `spend_amount` - Amount allocated to Spend category  
+- `spend_amount` - Amount allocated to Spend category
 - `save_amount` - Amount allocated to Save category
 - `invest_amount` - Amount allocated to Invest category
 - `notes` - Optional memo or description
@@ -34,6 +36,7 @@ Master record of each allowance distribution event.
 - `updated_at` - Last modification timestamp
 
 **Business Rules:**
+
 - `total_amount` must equal sum of individual category amounts
 - All category amounts must be non-negative
 - `distribution_date` can be in the past (backdating support)
@@ -41,15 +44,18 @@ Master record of each allowance distribution event.
 - Distribution creation triggers automatic balance updates and transaction creation
 
 **Data Validation:**
+
 - Total amount must be positive (no zero-dollar distributions)
 - Individual category amounts cannot exceed reasonable limits
 - Distribution date cannot be too far in the future
 - Manager-recipient relationship verified before creation
 
-### Transaction Entity  
+### Transaction Entity
+
 Detailed audit trail of individual financial movements.
 
 **Key Attributes:**
+
 - `id` - UUID, primary key for transaction identification
 - `recipient_id` - Foreign key linking to affected recipient
 - `distribution_id` - Foreign key linking to originating distribution (nullable)
@@ -62,6 +68,7 @@ Detailed audit trail of individual financial movements.
 - `created_at` - When transaction record was created
 
 **Business Rules:**
+
 - Every non-zero category allocation creates a transaction record
 - `balance_after` reflects category balance immediately after transaction
 - Transaction types support different financial operations:
@@ -72,6 +79,7 @@ Detailed audit trail of individual financial movements.
 - Transaction descriptions provide educational context
 
 **Transaction Types by Category:**
+
 - **Give Transactions:** Distributions, allocations to causes, donations
 - **Spend Transactions:** Distributions only (no individual purchase tracking)
 - **Save Transactions:** Distributions, allocations to wishlist items, purchases
@@ -80,9 +88,11 @@ Detailed audit trail of individual financial movements.
 ## Specialized Data Structures
 
 ### Undistributed Allowance Calculation
+
 Virtual entity calculated from recipient creation date and distribution history.
 
 **Calculated Fields:**
+
 - `weeks_since_created` - Time-based allowance accumulation
 - `total_allowance_owed` - Weeks × weekly allowance amount
 - `total_distributed` - Sum of all historical distributions
@@ -90,17 +100,19 @@ Virtual entity calculated from recipient creation date and distribution history.
 - `weekly_allowance` - Current allowance rate for recipient
 
 **Calculation Logic:**
+
 ```typescript
 interface UndistributedCalculation {
-  weeksSinceCreated: number;           // (now - recipient.created_at) / 7 days
-  totalAllowanceOwed: number;          // weeks × recipient.allowance_amount
-  totalDistributed: number;            // SUM(distributions.total_amount)
-  undistributedAmount: number;         // owed - distributed
-  weeklyAllowance: number;             // recipient.allowance_amount
+  weeksSinceCreated: number; // (now - recipient.created_at) / 7 days
+  totalAllowanceOwed: number; // weeks × recipient.allowance_amount
+  totalDistributed: number; // SUM(distributions.total_amount)
+  undistributedAmount: number; // owed - distributed
+  weeklyAllowance: number; // recipient.allowance_amount
 }
 ```
 
 **Business Rules:**
+
 - Calculation starts from recipient creation date
 - Allowance accumulates weekly based on recipient's allowance amount
 - Historical distributions reduce undistributed amount
@@ -108,9 +120,11 @@ interface UndistributedCalculation {
 - Calculation supports flexible distribution timing
 
 ### Balance Update Mechanics
+
 Automatic balance management through database triggers.
 
 **Update Process:**
+
 1. Distribution record created with category amounts
 2. Trigger function executes automatically
 3. Each category balance updated by adding distribution amount
@@ -118,6 +132,7 @@ Automatic balance management through database triggers.
 5. Transaction `balance_after` field populated with new balance
 
 **Balance Calculations by Category:**
+
 - **Give:** `balance = balance + distribution_amount`
 - **Spend:** `balance = balance + distribution_amount` (lifetime total)
 - **Save:** `balance = balance + distribution_amount`
@@ -126,6 +141,7 @@ Automatic balance management through database triggers.
 ## Database Schema Implementation
 
 ### Distributions Table
+
 ```sql
 CREATE TABLE distributions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -140,7 +156,7 @@ CREATE TABLE distributions (
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   -- Ensure total equals sum of parts
   CONSTRAINT total_equals_sum CHECK (
     total_amount = give_amount + spend_amount + save_amount + invest_amount
@@ -149,6 +165,7 @@ CREATE TABLE distributions (
 ```
 
 ### Transactions Table
+
 ```sql
 CREATE TABLE transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -165,15 +182,16 @@ CREATE TABLE transactions (
 ```
 
 ### Distribution Processing Trigger
+
 ```sql
 CREATE OR REPLACE FUNCTION process_distribution()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Update category balances
   UPDATE allowance_categories SET
-    balance = balance + CASE 
+    balance = balance + CASE
       WHEN category_type = 'give' THEN NEW.give_amount
-      WHEN category_type = 'spend' THEN NEW.spend_amount  
+      WHEN category_type = 'spend' THEN NEW.spend_amount
       WHEN category_type = 'save' THEN NEW.save_amount
       WHEN category_type = 'invest' THEN NEW.invest_amount
       ELSE 0
@@ -183,15 +201,15 @@ BEGIN
 
   -- Create transaction records for non-zero amounts
   INSERT INTO transactions (
-    recipient_id, distribution_id, category_type, transaction_type, 
+    recipient_id, distribution_id, category_type, transaction_type,
     amount, balance_after, transaction_date, description
   )
-  SELECT 
+  SELECT
     NEW.recipient_id,
     NEW.id,
     ac.category_type,
     'distribution',
-    CASE 
+    CASE
       WHEN ac.category_type = 'give' THEN NEW.give_amount
       WHEN ac.category_type = 'spend' THEN NEW.spend_amount
       WHEN ac.category_type = 'save' THEN NEW.save_amount
@@ -199,7 +217,7 @@ BEGIN
     END,
     ac.balance,
     NEW.distribution_date,
-    CASE 
+    CASE
       WHEN ac.category_type = 'give' THEN 'Allowance distribution to Give'
       WHEN ac.category_type = 'spend' THEN 'Allowance distribution to Spend'
       WHEN ac.category_type = 'save' THEN 'Allowance distribution to Save'
@@ -207,7 +225,7 @@ BEGIN
     END
   FROM allowance_categories ac
   WHERE ac.recipient_id = NEW.recipient_id
-  AND CASE 
+  AND CASE
     WHEN ac.category_type = 'give' THEN NEW.give_amount
     WHEN ac.category_type = 'spend' THEN NEW.spend_amount
     WHEN ac.category_type = 'save' THEN NEW.save_amount
@@ -226,9 +244,10 @@ CREATE TRIGGER process_distribution_trigger
 ## Query Patterns & Performance
 
 ### Common Queries
+
 ```sql
 -- Calculate undistributed allowance
-SELECT 
+SELECT
   r.id,
   r.allowance_amount,
   EXTRACT(DAYS FROM NOW() - r.created_at) / 7 as weeks_since_created,
@@ -247,13 +266,14 @@ LEFT JOIN distributions d ON t.distribution_id = d.id
 WHERE t.recipient_id = $1
 ORDER BY t.transaction_date DESC, t.created_at DESC;
 
--- Category-specific transaction history  
+-- Category-specific transaction history
 SELECT * FROM transactions
 WHERE recipient_id = $1 AND category_type = $2
 ORDER BY transaction_date DESC, created_at DESC;
 ```
 
 ### Performance Indexes
+
 ```sql
 -- Core relationship indexes
 CREATE INDEX idx_distributions_recipient_id ON distributions(recipient_id);
@@ -272,6 +292,7 @@ CREATE INDEX idx_distributions_recipient_date ON distributions(recipient_id, dis
 ## Security & Access Control
 
 ### Row-Level Security
+
 ```sql
 -- Distributions accessible through manager ownership
 CREATE POLICY "distributions_manager_access" ON distributions
@@ -281,14 +302,15 @@ CREATE POLICY "distributions_manager_access" ON distributions
 CREATE POLICY "transactions_recipient_access" ON transactions
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM recipients r 
-      WHERE r.id = transactions.recipient_id 
+      SELECT 1 FROM recipients r
+      WHERE r.id = transactions.recipient_id
       AND r.manager_id = auth.uid()
     )
   );
 ```
 
 ### Data Protection
+
 - **Financial Audit Trail:** Complete transaction history preserved indefinitely
 - **Manager Isolation:** Each family's financial data completely separate
 - **Immutable Records:** Historical distributions and transactions cannot be modified
@@ -297,18 +319,21 @@ CREATE POLICY "transactions_recipient_access" ON transactions
 ## Integration Points
 
 ### Category Systems
+
 - **Give Category:** Distributions fund charitable cause allocations
 - **Spend Category:** Distributions represent contribution history for reflection
 - **Save Category:** Distributions provide funds for wishlist goal pursuit
 - **Invest Category:** Distributions create principal for dividend calculations
 
 ### Educational Features
+
 - **Historical Analysis:** Transaction patterns support learning discussions
 - **Progress Tracking:** Distribution consistency indicates financial habit development
 - **Goal Achievement:** Distribution timing correlates with savings and giving milestones
 - **Family Planning:** Distribution data supports allowance adjustment decisions
 
 ### External Systems
+
 - **Trophy System:** Distribution milestones can trigger achievement recognition
 - **Analytics:** Distribution patterns inform educational effectiveness metrics
 - **Reporting:** Complete audit trail supports financial education assessment
