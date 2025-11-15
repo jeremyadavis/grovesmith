@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({
     request,
   });
@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     process.env.NODE_ENV === 'development' &&
     !request.nextUrl.pathname.startsWith('/_next')
   ) {
-    console.log('Middleware:', {
+    console.log('Proxy:', {
       path: request.nextUrl.pathname,
       hasUser: !!user,
       error: error?.message,
